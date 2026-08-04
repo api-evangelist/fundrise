@@ -1,0 +1,195 @@
+generated: '2026-08-04'
+method: derived
+source: openapi/fundrise-connect-openapi.yml
+docs: https://connect.fundrise.com/
+format: vendor-json
+rfc9457: false
+notes: >-
+  Derived from every 4xx/5xx response declared across the 17 operations of the Fundrise
+  Connect OpenAPI 3.1.0, enriched with the Errors narrative from the spec's
+  info.description. Fundrise does not use RFC 9457 application/problem+json — errors are
+  returned as application/json bodies conforming to the FundriseConnectError schema.
+
+envelope:
+  schema: FundriseConnectError
+  media_type: application/json
+  required:
+  - referenceId
+  properties:
+    referenceId:
+      type: string
+      max_length: 1000
+      description: Unique reference ID generated for every request, for error tracing. Also returned in the Request-Id response header.
+    code:
+      type: string
+      max_length: 6
+      description: A numeric code mapping to a specific validation error. Present only on programmatically resolvable 4xx errors.
+    message:
+      type: string
+      max_length: 1000
+      description: A human readable description of the error.
+    validationErrors:
+      type: object
+      schema: FieldErrorMap
+      description: Map of field name to an array of form validation error messages.
+
+policy:
+  documented_statement: >-
+    "Codes in the 2xx range indicate success. Codes in the 4xx range indicate an error
+    that failed given the information provided (e.g., a required parameter was omitted,
+    a charge failed, etc.). Codes in the 5xx range indicate an error with Fundrise's
+    servers (these are rare). Some 4xx errors that could be handled programmatically
+    (e.g., an address is invalid) include an error code that briefly explains the error
+    reported. These errors that can be handled programmatically have error codes in the
+    error response. Endpoints that have programmatically resolvable errors have those
+    codes defined in their schema definitions."
+  central_code_registry: false
+  central_code_registry_note: >-
+    Fundrise scopes the numeric `code` values to individual operation schema definitions
+    rather than publishing one catalog, so no enumerated code list can be harvested from
+    the public spec. An integrator must read code values per operation.
+
+problems:
+- status: 400
+  title: Bad Request
+  schema: FundriseConnectError
+  media_type: application/json
+  operation_count: 8
+  descriptions:
+  - Bad Request
+  - Invalid operation type, Improperly formatted fields
+  - Invalid operation type, Improperly formatted Client fields
+  remediation: >-
+    Inspect validationErrors for the per-field messages, and code where present.
+    Common causes are malformed address or date-of-birth fields on Client creation and
+    an investment amount outside the offering's minimumInvestmentAmount /
+    maximumInvestmentAmount, which are enforced per Transaction.
+  source_operations:
+  - openapi/fundrise-connect-openapi.yml#GetAccessToken
+  - openapi/fundrise-connect-openapi.yml#CreateShareLiquidationRequest
+  - openapi/fundrise-connect-openapi.yml#CancelShareLiquidationRequest
+  - openapi/fundrise-connect-openapi.yml#GetInvestmentAcknowledgments
+  - openapi/fundrise-connect-openapi.yml#CreateClient
+  - openapi/fundrise-connect-openapi.yml#UpdateClient
+  - openapi/fundrise-connect-openapi.yml#PlaceInvestment
+  - openapi/fundrise-connect-openapi.yml#CancelInvestment
+
+- status: 401
+  title: Unauthorized
+  schema: null
+  media_type: null
+  operation_count: 17
+  descriptions:
+  - Invalid or expired token
+  remediation: >-
+    For ClientBearerAuthentication operations, exchange the Client's stored refresh
+    token at POST /v1/oauth/token (GetAccessToken) for a fresh access token and retry.
+    For PartnerBasicAuthentication operations, verify the Partner credentials issued by
+    Fundrise support. Declared on every operation in the spec; no response body schema
+    is attached.
+  source_operations: all
+
+- status: 403
+  title: Forbidden
+  schema: FundriseConnectError
+  media_type: application/json
+  operation_count: 10
+  descriptions:
+  - Forbidden
+  remediation: >-
+    Distinct from 401 — the caller is authenticated but not permitted. Fundrise states
+    that "there may be services or capabilities documented that are inaccessible with
+    current permissions" and that additional endpoints are granted by contacting
+    connect@fundrise.com. Also raised when a Client attempts to act on an account it
+    does not own. Do not treat as retryable.
+  source_operations:
+  - openapi/fundrise-connect-openapi.yml#GetAccessToken
+  - openapi/fundrise-connect-openapi.yml#CreateShareLiquidationRequest
+  - openapi/fundrise-connect-openapi.yml#CancelShareLiquidationRequest
+  - openapi/fundrise-connect-openapi.yml#GetHoldings
+  - openapi/fundrise-connect-openapi.yml#CreateClient
+  - openapi/fundrise-connect-openapi.yml#UpdateClient
+  - openapi/fundrise-connect-openapi.yml#PlaceInvestment
+  - openapi/fundrise-connect-openapi.yml#GetTaxForms
+  - openapi/fundrise-connect-openapi.yml#GetTransaction
+  - openapi/fundrise-connect-openapi.yml#GetTransactions
+
+- status: 404
+  title: Not Found
+  schema: FundriseConnectError
+  media_type: application/json
+  operation_count: 9
+  descriptions:
+  - Not Found
+  - Transaction not found or account does not own transaction
+  remediation: >-
+    Re-resolve the identifier. offeringId values come from GetOfferings, accountId from
+    the accounts[] array returned by CreateClient or GetClient, and transactionId from
+    GetTransactions. Note that Fundrise conflates "does not exist" with "not owned by
+    this account" on GetTransaction, so a 404 there is not proof of non-existence.
+  source_operations:
+  - openapi/fundrise-connect-openapi.yml#CreateShareLiquidationRequest
+  - openapi/fundrise-connect-openapi.yml#CancelShareLiquidationRequest
+  - openapi/fundrise-connect-openapi.yml#GetHistoricalNav
+  - openapi/fundrise-connect-openapi.yml#GetOfferingDocuments
+  - openapi/fundrise-connect-openapi.yml#GetLiquidationAcknowledgments
+  - openapi/fundrise-connect-openapi.yml#GetInvestmentAcknowledgments
+  - openapi/fundrise-connect-openapi.yml#PlaceInvestment
+  - openapi/fundrise-connect-openapi.yml#CancelInvestment
+  - openapi/fundrise-connect-openapi.yml#GetTransaction
+
+- status: 409
+  title: Conflict creating resource
+  schema: FundriseConnectError
+  media_type: application/json
+  operation_count: 1
+  descriptions:
+  - Conflict creating resource
+  remediation: >-
+    The idempotency signal. Raised by CreateClient when the supplied partnerReferenceId
+    has already been used, meaning the Client already exists on the Fundrise side. Treat
+    as a successful no-op and resolve the existing Client rather than retrying with a new
+    key.
+  source_operations:
+  - openapi/fundrise-connect-openapi.yml#CreateClient
+
+- status: 500
+  title: Internal Server Error
+  schema: null
+  media_type: null
+  operation_count: 17
+  descriptions: []
+  remediation: >-
+    Fundrise states 5xx responses "are rare" and indicate a fault on their servers.
+    Retry with backoff; because PlaceInvestment and CreateClient carry a
+    partnerReferenceId idempotency key, retrying those two after a 500 is safe. Report
+    persistent failures to connect@fundrise.com with the Request-Id / referenceId.
+  source_operations: all
+
+summary:
+  distinct_statuses: 6
+  statuses:
+  - 400
+  - 401
+  - 403
+  - 404
+  - 409
+  - 500
+  operations_covered: 17
+  operations_with_4xx: 17
+  operations_with_5xx: 17
+  statuses_without_response_schema:
+  - 401
+  - 500
+  gaps:
+  - >-
+    401 and 500 are declared on all 17 operations with no response body schema, so an
+    agent cannot rely on a referenceId being parseable from those two.
+  - >-
+    No 429 is declared anywhere in the spec even though the documentation states rate
+    limiting is enforced per Client and per HTTP method — the throttling status and any
+    Retry-After signal are undocumented.
+  - >-
+    The numeric `code` values are said to live in per-operation schema definitions but
+    are not enumerated in the published spec, so no code-to-meaning registry exists
+    publicly.

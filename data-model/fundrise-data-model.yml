@@ -1,0 +1,300 @@
+generated: '2026-08-04'
+method: derived
+source: openapi/fundrise-connect-openapi.yml
+docs: https://connect.fundrise.com/
+notes: >-
+  Entity-relationship graph derived from the 37 component schemas of the Fundrise Connect
+  OpenAPI 3.1.0 — $ref links between schemas and id-reference fields (clientId, accountId,
+  offeringId, transactionId, documentId, acknowledgmentId). Fundrise publishes no
+  id-prefix convention; all identifiers are opaque strings typed by the shared
+  `Identifier` schema.
+
+identifier_convention:
+  shared_schema: Identifier
+  type: string
+  prefixes: none-published
+  note: >-
+    Every entity id resolves to the same opaque `Identifier` string schema. There is no
+    Stripe-style typed prefix, so an id is not self-describing and must be tracked
+    alongside its entity type by the integrator.
+
+entities:
+- name: Partner
+  description: >-
+    The company integrating Fundrise Connect. Not a fetchable resource — it is the
+    authentication subject behind PartnerBasicAuthentication and the owner of the
+    partnerReferenceId namespace.
+  schema: null
+  id_field: null
+  addressable: false
+
+- name: Client
+  description: >-
+    An end user the Partner onboards onto Fundrise. Created by the Partner, then acts on
+    its own behalf via a Client-scoped bearer token.
+  schemas:
+  - ClientCreationRequest
+  - ClientCreationResponse
+  - ClientResponse
+  - ClientUpdateRequest
+  - ClientUpdateResponse
+  id_field: clientId
+  operations:
+  - CreateClient
+  - GetClient
+  - UpdateClient
+  key_fields:
+  - partnerReferenceId
+  - primaryEmail
+  - firstName
+  - lastName
+  - taxId
+  - primaryAddress
+  - dateOfBirth
+  pii: true
+
+- name: Account
+  description: >-
+    The investing account belonging to a Client. Every operation that touches money or
+    holdings is scoped to an accountId.
+  schema: AccountIdResponse
+  id_field: accountId
+  addressable_directly: false
+  note: >-
+    There is no GET /account operation — accountId is only obtainable from the accounts[]
+    array on ClientCreationResponse or ClientResponse. Fundrise states a newly created
+    Client has exactly one account and that multiple accounts are on the long-term
+    roadmap.
+
+- name: Offering
+  description: >-
+    A Fundrise fund available for investment, with status OPEN or CLOSED, an asset class,
+    per-transaction investment minimum and maximum, current price and distribution rate.
+  schema: OfferingResponse
+  id_field: offeringId
+  operations:
+  - GetOfferings
+  - GetHistoricalNav
+  - GetOfferingDocuments
+  - GetInvestmentAcknowledgments
+  enums:
+    status: [OPEN, CLOSED]
+    assetClass: [REAL_ESTATE, PRIVATE_CREDIT, VENTURE]
+
+- name: OfferingNav
+  description: A single dated net asset value per share for an Offering.
+  schema: OfferingNavResponse
+  id_field: null
+  key_fields:
+  - effectiveDate
+  - netAssetValuePerShare
+
+- name: Document
+  description: >-
+    An offering document or disclosure a Client must be shown before investing.
+  schema: DocumentResponse
+  id_field: documentId
+  enums:
+    documentType: [AGREEMENT, ACKNOWLEDGMENT, DISCLOSURE, PROSPECTUS, OFFERING_CIRCULAR, OTHER, STATEMENT, TAX_FORM]
+
+- name: Acknowledgment
+  description: >-
+    Text a Client must digitally accept before an investment or liquidation is permitted.
+  schemas:
+  - Acknowledgment
+  - AcknowledgmentResponse
+  id_field: acknowledgmentId
+  operations:
+  - GetInvestmentAcknowledgments
+  - GetLiquidationAcknowledgments
+
+- name: Investment
+  description: >-
+    A placement of dollars into an Offering on behalf of a Client. Surfaces as a
+    Transaction of type INVESTMENT once placed.
+  schema: InvestmentPlacementRequest
+  id_field: transactionId
+  operations:
+  - PlaceInvestment
+  - CancelInvestment
+  idempotency_key: partnerReferenceId
+
+- name: Liquidation
+  description: >-
+    A request to sell shares back for dollars. May span multiple Offerings in one request.
+  schemas:
+  - ShareLiquidationRequest
+  - ShareLiquidationOfferingRequest
+  id_field: shareLiquidationRequestId
+  operations:
+  - CreateShareLiquidationRequest
+  - CancelShareLiquidationRequest
+
+- name: Holding
+  description: >-
+    A Client's position in one Offering — shares, cost basis, current/pending/settled
+    value, unpaid distributions, and whether it is liquidable. Updates daily.
+  schema: HoldingResponse
+  id_field: null
+  operations:
+  - GetHoldings
+
+- name: Transaction
+  description: >-
+    A money movement on an account — INVESTMENT, LIQUIDATION or DIVIDEND — with a status
+    lifecycle and a per-offering breakdown.
+  schemas:
+  - TransactionResponse
+  - TransactionOfferingResponse
+  id_field: transactionId
+  operations:
+  - GetTransactions
+  - GetTransaction
+  enums:
+    transactionType: [INVESTMENT, LIQUIDATION, DIVIDEND]
+    status: [PENDING, COMPLETE, FAILED]
+    debitCreditMemo: [DEBIT, CREDIT]
+
+- name: TaxDocument
+  description: A tax form issued for an account for a given tax year.
+  schema: TaxDocumentResponse
+  id_field: documentId
+  operations:
+  - GetTaxForms
+
+- name: Address
+  description: Postal address value object embedded on a Client.
+  schemas:
+  - Address
+  - AddressRequest
+  - AddressResponse
+  id_field: null
+  embedded: true
+
+relationships:
+- from: Partner
+  to: Client
+  type: has_many
+  via: partnerReferenceId
+  evidence: >-
+    partnerReferenceId on ClientCreationRequest is the Partner's own unique reference for
+    the Client and doubles as the idempotency key.
+- from: Client
+  to: Account
+  type: has_many
+  via: accounts
+  cardinality_today: exactly-one
+  evidence: ClientCreationResponse.accounts and ClientResponse.accounts are arrays of AccountIdResponse.
+- from: Client
+  to: Address
+  type: has_one
+  via: primaryAddress
+  evidence: ClientCreationRequest.primaryAddress -> AddressRequest; ClientResponse.primaryAddress -> AddressResponse.
+- from: Account
+  to: Holding
+  type: has_many
+  via: accountId
+  evidence: GET /v1/account/{accountId}/holdings returns HoldingResponse.
+- from: Account
+  to: Transaction
+  type: has_many
+  via: accountId
+  evidence: GET /v1/account/{accountId}/transactions returns TransactionResponse.
+- from: Account
+  to: TaxDocument
+  type: has_many
+  via: accountId
+  evidence: GET /v1/account/{accountId}/tax-forms returns TaxDocumentResponse.
+- from: Account
+  to: Investment
+  type: has_many
+  via: accountId
+  evidence: POST /v1/account/{accountId}/investment.
+- from: Account
+  to: Liquidation
+  type: has_many
+  via: accountId
+  evidence: POST /v1/account/{accountId}/liquidation.
+- from: Holding
+  to: Offering
+  type: belongs_to
+  via: offeringId
+  evidence: HoldingResponse.offeringId -> Identifier.
+- from: Investment
+  to: Offering
+  type: belongs_to
+  via: offeringId
+  evidence: InvestmentPlacementRequest.offeringId -> Identifier.
+- from: Investment
+  to: Document
+  type: has_many
+  via: acknowledgedDocumentIds
+  evidence: InvestmentPlacementRequest.acknowledgedDocumentIds is an array of Identifier.
+- from: Offering
+  to: Document
+  type: has_many
+  via: offeringId
+  evidence: GET /v1/offering/{offeringId}/documents returns DocumentResponse.
+- from: Offering
+  to: Acknowledgment
+  type: has_many
+  via: offeringId
+  evidence: GET /v1/offering/{offeringId}/acknowledgments returns AcknowledgmentResponse.
+- from: Offering
+  to: OfferingNav
+  type: has_many
+  via: offeringId
+  evidence: OfferingHistoricalNavResponse.offeringId plus historicalDailyNav array of OfferingNavResponse.
+- from: Offering
+  to: AssetClass
+  type: has_one
+  via: assetClass
+  evidence: OfferingResponse.assetClass -> AssetClass -> AssetClassEnum.
+- from: Offering
+  to: PriceResponse
+  type: has_one
+  via: currentPrice
+  evidence: OfferingResponse.currentPrice.
+- from: Liquidation
+  to: Offering
+  type: has_many
+  via: offerings
+  evidence: ShareLiquidationRequest.offerings is an array of ShareLiquidationOfferingRequest, each carrying offeringId and shares.
+- from: Transaction
+  to: Offering
+  type: has_many
+  via: offerings
+  evidence: TransactionResponse.offerings is an array of TransactionOfferingResponse, each carrying offeringId.
+- from: Transaction
+  to: Investment
+  type: has_one
+  via: transactionType
+  note: A placed Investment materialises as a Transaction with transactionType INVESTMENT.
+- from: Transaction
+  to: Liquidation
+  type: has_one
+  via: transactionType
+  note: A placed Liquidation materialises as a Transaction with transactionType LIQUIDATION.
+
+root_entities:
+- Client
+- Offering
+
+traversal_notes:
+- >-
+  Offering is the only entity resolvable with Partner credentials alone (GetOfferings).
+  Everything else requires a Client bearer token.
+- >-
+  accountId is the hinge of the whole model and is reachable only through CreateClient or
+  GetClient — there is no account lookup or list operation.
+- >-
+  Document and Acknowledgment must both be traversed from Offering before an Investment
+  can be created; this is a regulatory ordering constraint encoded in the schema, since
+  acknowledgedDocumentIds is required on InvestmentPlacementRequest.
+
+summary:
+  schemas: 37
+  entities: 13
+  relationships: 21
+  enums: 7
+  render: null

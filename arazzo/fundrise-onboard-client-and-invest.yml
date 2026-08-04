@@ -1,0 +1,214 @@
+arazzo: 1.0.1
+info:
+  title: Fundrise Connect — onboard a Client and place an Investment
+  version: 1.0.0
+  description: >-
+    The primary Fundrise Connect flow, modelled from the sequence Fundrise publishes under
+    the "Workflow Example" tag of its own OpenAPI: create a Client, exchange the issued
+    refresh token for a Client access token, resolve an open Offering, fetch and present
+    that Offering's documents and acknowledgments, then place the Investment. Every
+    operationId below exists verbatim in openapi/fundrise-connect-openapi.yml.
+
+    Run this against the sandbox host (https://sandbox.fundrise.com) — the only server the
+    published spec declares. Fundrise publishes no sandbox test values, so offeringId must
+    be discovered at runtime from GetOfferings rather than seeded from a fixture.
+
+x-generated: '2026-08-04'
+x-method: derived
+x-source: https://connect.fundrise.com/
+x-guardrail: >-
+  Steps 4 and 5 exist to put real disclosures in front of a real person. Step 6 moves real
+  money into a private-market security. This workflow is not safe to run unattended —
+  acknowledgedDocumentIds must reflect a genuine human acceptance, not an automatic one.
+
+sourceDescriptions:
+- name: fundriseConnect
+  url: ../openapi/fundrise-connect-openapi.yml
+  type: openapi
+
+workflows:
+- workflowId: onboard-client-and-place-investment
+  summary: Onboard an end user as a Fundrise Client and place their first investment.
+  description: >-
+    Six steps, two authentication subjects. Steps 1, 2, 3 and 4 use Partner HTTP Basic
+    credentials; steps 5 and 6 use the Client bearer token minted in step 2.
+  inputs:
+    type: object
+    required:
+    - partnerReferenceId
+    - primaryEmail
+    - firstName
+    - lastName
+    - taxId
+    - dateOfBirth
+    - amount
+    properties:
+      partnerReferenceId:
+        type: string
+        description: >-
+          Your own opaque unique id for this person. Doubles as the idempotency key for
+          Client creation. Fundrise requires that it contain no PII — do not use an email
+          address.
+      primaryEmail:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      taxId:
+        type: string
+        description: The Client's tax identifier. Sensitive — never log this value.
+      dateOfBirth:
+        type: string
+      address1:
+        type: string
+      address2:
+        type: string
+      city:
+        type: string
+      state:
+        type: string
+      zip:
+        type: string
+      country:
+        type: string
+      investmentReferenceId:
+        type: string
+        description: >-
+          A second, distinct idempotency key scoping the investment itself. If omitted,
+          reuse of partnerReferenceId is NOT correct — generate a separate value.
+      amount:
+        type: string
+        description: >-
+          Investment amount in US dollars, as a string. Must fall between the offering's
+          minimumInvestmentAmount and maximumInvestmentAmount, which are enforced per
+          transaction.
+      assetClass:
+        type: string
+        description: Optional filter — REAL_ESTATE, PRIVATE_CREDIT or VENTURE.
+
+  steps:
+
+  - stepId: create-client
+    description: >-
+      Onboard the end user. Partner HTTP Basic auth. A 409 means this partnerReferenceId
+      already maps to an existing Client — treat that as a successful no-op and resolve the
+      existing Client rather than retrying with a new key.
+    operationId: $sourceDescriptions.fundriseConnect.CreateClient
+    requestBody:
+      contentType: application/json
+      payload:
+        partnerReferenceId: $inputs.partnerReferenceId
+        primaryEmail: $inputs.primaryEmail
+        firstName: $inputs.firstName
+        lastName: $inputs.lastName
+        taxId: $inputs.taxId
+        dateOfBirth: $inputs.dateOfBirth
+        primaryAddress:
+          address1: $inputs.address1
+          address2: $inputs.address2
+          city: $inputs.city
+          state: $inputs.state
+          zip: $inputs.zip
+          country: $inputs.country
+    successCriteria:
+    - condition: $statusCode == 201
+    outputs:
+      clientId: $response.body#/clientId
+      refreshToken: $response.body#/refreshToken
+      accountId: $response.body#/accounts/0/accountId
+
+  - stepId: get-access-token
+    description: >-
+      Exchange the refresh token issued at Client creation for a Client-scoped access
+      token. The refresh token does not expire and must be stored encrypted at rest —
+      never expose it to the Client or a Client device.
+    operationId: $sourceDescriptions.fundriseConnect.GetAccessToken
+    requestBody:
+      contentType: application/json
+      payload:
+        refreshToken: $steps.create-client.outputs.refreshToken
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      accessToken: $response.body#/accessToken
+      expiresIn: $response.body#/expiresIn
+
+  - stepId: get-offerings
+    description: >-
+      List offerings available through Connect. Select one whose status is OPEN — CLOSED
+      offerings cannot be invested in. Partner HTTP Basic auth.
+    operationId: $sourceDescriptions.fundriseConnect.GetOfferings
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      offeringId: $response.body#/0/offeringId
+      offeringName: $response.body#/0/offeringName
+      offeringStatus: $response.body#/0/status
+      minimumInvestmentAmount: $response.body#/0/minimumInvestmentAmount
+      maximumInvestmentAmount: $response.body#/0/maximumInvestmentAmount
+
+  - stepId: get-offering-documents
+    description: >-
+      Fetch the documents and disclosures for the selected offering. These must be
+      presented to the Client. Collect every documentId — they are required as
+      acknowledgedDocumentIds on the investment request.
+    operationId: $sourceDescriptions.fundriseConnect.GetOfferingDocuments
+    parameters:
+    - name: offeringId
+      in: path
+      value: $steps.get-offerings.outputs.offeringId
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      documentId: $response.body#/0/documentId
+      documentUrl: $response.body#/0/documentUrl
+      documentType: $response.body#/0/documentType
+
+  - stepId: get-investment-acknowledgments
+    description: >-
+      Fetch the acknowledgments the Client must digitally accept for this offering. Client
+      bearer auth. Fundrise requires the Partner platform to display a checkbox per
+      acknowledgment and require the user to check it to proceed — an automated pass
+      through this step defeats a securities-law control.
+    operationId: $sourceDescriptions.fundriseConnect.GetInvestmentAcknowledgments
+    parameters:
+    - name: offeringId
+      in: path
+      value: $steps.get-offerings.outputs.offeringId
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      acknowledgmentId: $response.body#/0/acknowledgmentId
+      acknowledgmentText: $response.body#/0/acknowledgmentText
+
+  - stepId: place-investment
+    description: >-
+      Place the investment. Client bearer auth. acknowledgedDocumentIds must carry the
+      documentIds the Client actually accepted in the preceding two steps. On a 500,
+      retrying with the same partnerReferenceId is safe because it is the idempotency key
+      for this investment.
+    operationId: $sourceDescriptions.fundriseConnect.PlaceInvestment
+    parameters:
+    - name: accountId
+      in: path
+      value: $steps.create-client.outputs.accountId
+    requestBody:
+      contentType: application/json
+      payload:
+        partnerReferenceId: $inputs.investmentReferenceId
+        offeringId: $steps.get-offerings.outputs.offeringId
+        amount: $inputs.amount
+        acknowledgedDocumentIds:
+        - $steps.get-offering-documents.outputs.documentId
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      transactionId: $response.body#/transactionId
+      status: $response.body#/status
+
+  outputs:
+    clientId: $steps.create-client.outputs.clientId
+    accountId: $steps.create-client.outputs.accountId
+    offeringId: $steps.get-offerings.outputs.offeringId
+    transactionId: $steps.place-investment.outputs.transactionId

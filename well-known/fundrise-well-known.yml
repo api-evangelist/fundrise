@@ -1,0 +1,118 @@
+generated: '2026-08-04'
+method: searched
+source: live probes of every Fundrise host in apis.yml and the OpenAPI servers[]
+notes: >-
+  fundrise.com is a single-page application whose origin returns HTTP 200 with the
+  same 5,308-byte app shell for every unmatched path, so bare status codes are not
+  trustworthy on that host. Only responses whose body actually parsed as the expected
+  document type are recorded as hits below; every other path is recorded with the
+  observed status and marked hit:false.
+hosts:
+- host: https://fundrise.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    hit: true
+    content_type: text/plain
+    file: fundrise-security.txt
+    note: RFC 9116. Contact securitydisclosure@fundrise.com; Expires 2030-02-20.
+  - path: /.well-known/openid-configuration
+    status: 200
+    hit: true
+    content_type: application/json
+    file: fundrise-openid-configuration.json
+    note: >-
+      OIDC discovery. Publishes authorization_endpoint https://fundrise.com/oauth/authorize,
+      token_endpoint https://api.fundrise.com/oauth/token, scopes_supported [openid,
+      offline_access], response_types_supported [code], token_endpoint_auth_methods
+      [client_secret_basic]. This is the consumer OAuth surface and is distinct from
+      the Fundrise Connect partner API's own /v1/oauth/token operation.
+  - path: /.well-known/security.txt.gpg
+    status: 200
+    hit: false
+    note: Referenced by the Encryption field of security.txt; binary key, not stored here.
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+    hit: false
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+    hit: false
+  - path: /.well-known/api-catalog
+    status: 403
+    hit: false
+  - path: /.well-known/ai-plugin.json
+    status: 403
+    hit: false
+  - path: /.well-known/agent-card.json
+    status: 403
+    hit: false
+  - path: /.well-known/agent.json
+    status: 403
+    hit: false
+  - path: /llms.txt
+    status: 404
+    hit: false
+- host: https://connect.fundrise.com
+  note: Static Redocly documentation build served from S3; all probes returned S3 NoSuchKey.
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    hit: false
+  - path: /.well-known/openid-configuration
+    status: 404
+    hit: false
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    hit: false
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    hit: false
+  - path: /.well-known/api-catalog
+    status: 404
+    hit: false
+  - path: /.well-known/agent-card.json
+    status: 404
+    hit: false
+  - path: /.well-known/agent.json
+    status: 404
+    hit: false
+  - path: /llms.txt
+    status: 404
+    hit: false
+- host: https://api.fundrise.com
+  note: >-
+    Production API host, named as the token_endpoint in the OIDC discovery document.
+    Every /.well-known/* probe returned 403 from the edge.
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    hit: false
+  - path: /.well-known/openid-configuration
+    status: 403
+    hit: false
+  - path: /.well-known/agent-card.json
+    status: 403
+    hit: false
+  - path: /.well-known/agent.json
+    status: 403
+    hit: false
+- host: https://sandbox.fundrise.com
+  note: >-
+    The only host declared in the OpenAPI servers[] block. Did not resolve/connect
+    on any anonymous probe (curl exit, no HTTP status), consistent with a
+    partner-allowlisted sandbox.
+  documents:
+  - path: /.well-known/security.txt
+    status: null
+    hit: false
+  - path: /.well-known/agent-card.json
+    status: null
+    hit: false
+  - path: /.well-known/agent.json
+    status: null
+    hit: false
+summary:
+  hits: 2
+  agent_card: none
+  api_catalog: none
+  ai_plugin: none

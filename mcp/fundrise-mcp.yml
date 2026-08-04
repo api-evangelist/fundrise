@@ -1,0 +1,132 @@
+generated: '2026-08-04'
+method: derived
+status: candidate
+source: openapi/fundrise-connect-openapi.yml
+notes: >-
+  Fundrise publishes NO Model Context Protocol server. This file is a candidate tool
+  design derived from the 17 operations of the published OpenAPI 3.1.0 — a proposal, not
+  a discovered artifact. Because no server exists, no `MCPServer` pointer is wired into
+  apis.yml; emitting one would credit Fundrise with an agent surface it does not operate.
+  No tool crosswalk is emitted either, for the same reason — a crosswalk requires a real
+  MCP or GraphQL surface to bind against.
+
+search:
+  performed: '2026-08-04'
+  result: none-found
+  checked:
+  - Fundrise Connect documentation (https://connect.fundrise.com/)
+  - Fundrise Connect product page (https://fundrise.com/connect-api)
+  - github.com/fundrise — organization is real and domain-verified, zero public repositories
+  - npm registry search for "fundrise" — no packages
+  - PyPI, RubyGems, Packagist, crates.io — no packages
+  - web search for a Fundrise MCP server — no results
+
+server:
+  published: false
+  name: fundrise-connect
+  transport: null
+  url: null
+
+agent_suitability:
+  note: >-
+    This API is a poor fit for unsupervised agent execution and any MCP server built from
+    it should reflect that. Placing an investment or a liquidation moves real money into
+    or out of a private-market security, and the contract requires the end user to have
+    been shown and to have digitally accepted the offering's disclosures first
+    (acknowledgedDocumentIds / allAcknowledgmentsAccepted). The read side — offerings,
+    NAV history, holdings, transactions, tax forms — is genuinely useful to an agent and
+    carries no such hazard. See agentic-access/fundrise-agentic-access.yml.
+
+tools:
+- name: fundrise_get_offerings
+  description: List Fundrise offerings available for investment, with status, asset class, current price, distribution rate, and per-transaction investment minimum and maximum.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetOfferings
+  auth: PartnerBasicAuthentication
+  read_only: true
+- name: fundrise_get_historical_nav
+  description: Get the historical daily net asset value per share for one offering.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetHistoricalNav
+  auth: PartnerBasicAuthentication
+  read_only: true
+- name: fundrise_get_offering_documents
+  description: Get the documents and disclosures that must be presented for one offering.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetOfferingDocuments
+  auth: PartnerBasicAuthentication
+  read_only: true
+- name: fundrise_get_investment_acknowledgments
+  description: Get the acknowledgments a Client must accept before investing in one offering.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetInvestmentAcknowledgments
+  auth: ClientBearerAuthentication
+  read_only: true
+- name: fundrise_get_liquidation_acknowledgments
+  description: Get the acknowledgments a Client must accept before requesting a liquidation.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetLiquidationAcknowledgments
+  auth: ClientBearerAuthentication
+  read_only: true
+- name: fundrise_get_client
+  description: Read the authenticated Client's profile and account list.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetClient
+  auth: ClientBearerAuthentication
+  read_only: true
+  pii: true
+- name: fundrise_get_holdings
+  description: Read a Client's holdings for an account — shares, cost basis, current value, unpaid distributions, and whether each position is liquidable. Updates daily.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetHoldings
+  auth: ClientBearerAuthentication
+  read_only: true
+- name: fundrise_get_transactions
+  description: List transactions on an account (investments, liquidations, dividends) with status and per-offering breakdown.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetTransactions
+  auth: ClientBearerAuthentication
+  read_only: true
+- name: fundrise_get_transaction
+  description: Read one transaction by type and id.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetTransaction
+  auth: ClientBearerAuthentication
+  read_only: true
+- name: fundrise_get_tax_forms
+  description: List tax documents issued for an account, optionally for one tax year.
+  source_operation: openapi/fundrise-connect-openapi.yml#GetTaxForms
+  auth: ClientBearerAuthentication
+  read_only: true
+  pii: true
+
+write_tools_not_recommended_without_human_approval:
+- name: fundrise_create_client
+  source_operation: openapi/fundrise-connect-openapi.yml#CreateClient
+  reason: >-
+    Creates a real investor record from PII including tax ID and date of birth, and
+    returns a non-expiring refresh token that must be stored encrypted. Requires a
+    partnerReferenceId idempotency key.
+- name: fundrise_update_client
+  source_operation: openapi/fundrise-connect-openapi.yml#UpdateClient
+  reason: Mutates an investor's identity and address of record.
+- name: fundrise_place_investment
+  source_operation: openapi/fundrise-connect-openapi.yml#PlaceInvestment
+  reason: >-
+    Moves real money into a private-market security. Requires prior presentation and
+    digital acceptance of offering documents and acknowledgments by the end user.
+    Human-in-the-loop should be required, not conditional.
+- name: fundrise_cancel_investment
+  source_operation: openapi/fundrise-connect-openapi.yml#CancelInvestment
+  reason: Reverses a pending investment; only valid while isCancellable is true.
+- name: fundrise_create_liquidation
+  source_operation: openapi/fundrise-connect-openapi.yml#CreateShareLiquidationRequest
+  reason: >-
+    Sells shares back for dollars. Requires acknowledgment acceptance and a liquidable
+    holding. Human-in-the-loop should be required.
+- name: fundrise_cancel_liquidation
+  source_operation: openapi/fundrise-connect-openapi.yml#CancelShareLiquidationRequest
+  reason: Reverses a pending liquidation request.
+
+excluded:
+- operation: GetAccessToken
+  reason: >-
+    Credential exchange is transport plumbing, not a tool. A refresh token must never be
+    exposed to a model; the server should hold it and mint access tokens internally.
+
+coverage:
+  rest_operations: 17
+  candidate_tools: 10
+  write_tools_gated: 6
+  excluded: 1

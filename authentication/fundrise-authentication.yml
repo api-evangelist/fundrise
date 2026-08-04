@@ -1,0 +1,161 @@
+generated: '2026-08-04'
+method: searched
+source: openapi/fundrise-connect-openapi.yml
+docs: https://connect.fundrise.com/#tag/Authentication
+notes: >-
+  Baseline derived by 0-working/derive-authentication.py from the published OpenAPI 3.1.0,
+  then upgraded from the Authentication tag of the Fundrise Connect documentation, which
+  documents the two-subject model, the token exchange, the credential-handling
+  obligations, and the per-partner access-control layer that the securitySchemes block
+  alone does not express.
+
+summary:
+  types:
+  - http
+  http_schemes:
+  - basic
+  - bearer
+  api_key_in: []
+  oauth2_flows_declared_in_spec: []
+  oauth2_in_practice:
+  - refresh_token
+  model: two-subject
+  access_request: https://fundrise.com/connect-api/contact
+  contact: connect@fundrise.com
+
+schemes:
+- name: PartnerBasicAuthentication
+  type: http
+  scheme: basic
+  subject: Partner
+  rfc: RFC 7617
+  description: >-
+    "PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner
+    username and password will be provided by Fundrise support. The Partner password
+    should be stored securely. At a minimum, it should be encrypted at-rest and access
+    restricted to services making requests to the Fundrise API. The Partner password
+    should not be exposed to a Client or any of their devices. If the password is
+    compromised please contact Fundrise support."
+  credential_issuance: Fundrise support (connect@fundrise.com)
+  self_service: false
+  rotation_policy: not-published
+  operations:
+  - GetAccessToken
+  - GetOfferings
+  - GetHistoricalNav
+  - GetOfferingDocuments
+  - CreateClient
+  sources:
+  - openapi/fundrise-connect-openapi.yml
+
+- name: ClientBearerAuthentication
+  type: http
+  scheme: bearer
+  subject: Client
+  rfc: RFC 6750
+  description: >-
+    "ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an
+    OAuth access token. Since access tokens are scoped to specific Clients, they identify
+    and authenticate the Client in a request. Access tokens can be obtained in Get Access
+    Token requests by using the refresh token flow. OAuth refresh tokens are issued on
+    Client Creation and scoped specifically to that Client. The refresh tokens will not
+    expire and should be stored securely after Client creation. At a minimum, refresh
+    tokens should be encrypted at-rest and access restricted to services making requests
+    to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their
+    devices."
+  bearer_format: not-published
+  operations:
+  - CreateShareLiquidationRequest
+  - CancelShareLiquidationRequest
+  - GetLiquidationAcknowledgments
+  - GetInvestmentAcknowledgments
+  - GetHoldings
+  - GetClient
+  - UpdateClient
+  - PlaceInvestment
+  - CancelInvestment
+  - GetTaxForms
+  - GetTransaction
+  - GetTransactions
+  sources:
+  - openapi/fundrise-connect-openapi.yml
+
+token_exchange:
+  operation: GetAccessToken
+  path: /v1/oauth/token
+  method: post
+  auth: PartnerBasicAuthentication
+  grant: refresh_token
+  request_field: refreshToken
+  response_schema: OAuth2AccessTokenResponse
+  response_fields:
+  - accessToken
+  - refreshToken
+  - scope
+  - tokenType
+  - expiresIn
+  refresh_token_source: CreateClient
+  refresh_token_expiry: none
+  access_token_expiry: returned as expiresIn; no fixed value published
+  note: >-
+    A genuine OAuth refresh-token exchange is modelled in the spec as a plain http bearer
+    securityScheme rather than an oauth2 scheme with declared flows, so generated clients
+    receive no flow metadata, no tokenUrl, and no scope list. Declaring it as oauth2 with
+    a clientCredentials or custom flow would make the contract self-describing.
+
+separate_consumer_oauth_surface:
+  discovery: https://fundrise.com/.well-known/openid-configuration
+  http_status: 200
+  authorization_endpoint: https://fundrise.com/oauth/authorize
+  token_endpoint: https://api.fundrise.com/oauth/token
+  scopes_supported:
+  - openid
+  - offline_access
+  response_types_supported:
+  - code
+  token_endpoint_auth_methods:
+  - client_secret_basic
+  note: >-
+    This is Fundrise's consumer-facing OAuth/OIDC authorization server, discovered
+    anonymously and distinct from the Connect partner API's own token operation. It is
+    recorded here and in scopes/fundrise-scopes.yml because it is the only place Fundrise
+    publishes named scopes. The discovery document omits issuer, jwks_uri,
+    subject_types_supported and id_token_signing_alg_values_supported, so it is a partial
+    rather than conformant OIDC discovery document.
+
+authorization:
+  model: scheme-per-operation plus per-partner allowlist
+  scopes: see scopes/fundrise-scopes.yml
+  documented_statement: >-
+    "To ensure a safe, secure platform, Fundrise imposes strict access controls to all
+    APIs. As such, there may be services or capabilities documented that are inaccessible
+    with current permissions. Contact the support team via connect@fundrise.com to gain
+    permissions for additional endpoints."
+  note: >-
+    Endpoint-level authorization is expressed by which of the two schemes an operation
+    requires, plus an out-of-band per-partner permission grant. A 403 on a documented
+    operation is expected behaviour under this model, not a defect.
+
+credential_handling_requirements:
+- Partner password encrypted at rest.
+- Client refresh tokens encrypted at rest.
+- Access to both restricted to the services making API requests.
+- Neither ever exposed to a Client or a Client device.
+- Compromise reported to Fundrise support.
+
+gaps:
+- The OAuth exchange is not declared as an oauth2 securityScheme, so flows and scopes are invisible to tooling.
+- No bearerFormat is declared, so token structure (JWT or opaque) is undocumented.
+- Refresh tokens never expire and no rotation or revocation mechanism is published.
+- No mutual TLS, no request signing, and no key rotation policy documented for Partner Basic credentials.
+- The OIDC discovery document is incomplete against OpenID Connect Discovery 1.0.
+
+x-evidence:
+- fetched: '2026-08-04'
+  url: https://connect.fundrise.com/
+  http_status: 200
+  note: OpenAPI 3.1.0 and the Authentication tag narrative.
+- fetched: '2026-08-04'
+  url: https://fundrise.com/.well-known/openid-configuration
+  http_status: 200
+  content_type: application/json

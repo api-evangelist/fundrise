@@ -1,0 +1,110 @@
+generated: '2026-08-04'
+method: searched
+source: https://connect.fundrise.com/
+docs: https://connect.fundrise.com/
+api: openapi/fundrise-connect-openapi.yml
+
+versioning:
+  scheme: uri-path
+  current: v1
+  spec_version: 1.0.0
+  docs: https://connect.fundrise.com/
+  documented_statement: >-
+    "API endpoints are versioned with path versioning. Each endpoint contains a version
+    path parameter e.g. (/v1/...). To release new functionality without impacting
+    existing customers, we will version endpoints and increment version numbers
+    accordingly."
+  granularity: per-endpoint
+  note: >-
+    Versions are incremented per endpoint rather than across the whole API, so a Partner
+    can in principle be on /v1 for one resource and /v2 for another. All 17 currently
+    published operations are on v1.
+
+deprecation:
+  policy_published: true
+  policy_url: https://connect.fundrise.com/
+  documented_statement: >-
+    "When endpoints are staged to be deprecated, Partners will be given ample time to
+    integrate with new versions according to our service agreement. Partners should
+    expect to receive communications related to deprecation timelines."
+  notification_channel: direct partner communication
+  notice_period: governed by the partner service agreement; no public duration
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    The deprecation commitment is contractual and communicated out of band rather than
+    signalled in-protocol. Neither the RFC 8594 Sunset header nor the Deprecation header
+    is documented, and no operation in the OpenAPI carries deprecated: true — so an
+    automated client has no machine-readable warning of an endpoint's retirement.
+
+deprecated_operations: []
+
+maturity:
+  stage: prototype
+  documented_statement: >-
+    "This API represents a prototype of Fundrise Connect, which is our external API for
+    providing Client onboarding and investment into our alternative assets."
+  additional_statement: >-
+    The Workflow Example tag notes the onboarding flow "is subject to modification
+    pending future refinements to this spec."
+  roadmap_items_stated_in_docs:
+  - >-
+    Multiple accounts per Client — "Currently multiple accounts are not supported in the
+    system, but is on our long term roadmap to build." Newly created Clients have exactly
+    one account.
+
+sla:
+  published: false
+  note: >-
+    No public SLA or uptime commitment was found. Availability terms sit inside the
+    partner service agreement, which is not public.
+
+status_page:
+  published: false
+  probed:
+  - url: https://status.fundrise.com
+    result: did not resolve
+  - url: https://fundrise.com/status
+    result: >-
+      404 under rendered fetch (the origin returns a 200 SPA shell for every unmatched
+      path, so the raw status code is not meaningful on this host)
+  note: >-
+    No public status page or incident history exists for Fundrise or for the Connect
+    API. No StatusPage pointer is emitted in apis.yml, because none is published.
+
+changelog:
+  published: false
+  probed:
+  - url: https://fundrise.com/changelog
+    result: 404 under rendered fetch
+  note: >-
+    No dated public changelog for the Connect API. The OpenAPI carries info.version
+    1.0.0 and no revision history, so version drift is not externally observable. No
+    ChangeLog pointer is emitted.
+
+support:
+  api_contact: connect@fundrise.com
+  contact_name: Fundrise Connect Support Team
+  access_request: https://fundrise.com/connect-api/contact
+  general_help_center: https://fundrise.com/help
+
+gaps:
+- No status page or incident history.
+- No public changelog or release notes for the API.
+- No Sunset / Deprecation response headers (RFC 8594) despite a stated deprecation policy.
+- No public SLA or uptime target.
+- Spec is self-described as a prototype and explicitly subject to change.
+
+x-evidence:
+- fetched: '2026-08-04'
+  url: https://connect.fundrise.com/
+  http_status: 200
+  content_type: text/html
+- fetched: '2026-08-04'
+  url: https://fundrise.com/status
+  http_status: 404
+- fetched: '2026-08-04'
+  url: https://status.fundrise.com
+  http_status: null
+  note: host did not resolve

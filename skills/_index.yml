@@ -1,0 +1,81 @@
+generated: '2026-08-04'
+method: generated
+source: openapi/fundrise-connect-openapi.yml, conventions/fundrise-conventions.yml, errors/fundrise-problem-types.yml
+provider: fundrise
+api: fundrise:fundrise-connect
+notes: >-
+  Packaged Agent Skills for the Fundrise Connect API. Every operationId referenced below
+  was verified against the published OpenAPI 3.1.0 — none are invented. Fundrise publishes
+  no AGENTS.md or skill files of its own; these are generated from the spec plus the
+  documented conventions, and the onboarding skill follows the sequence Fundrise itself
+  publishes under the "Workflow Example" tag.
+
+search:
+  performed: '2026-08-04'
+  provider_published_skills: none-found
+  checked:
+  - https://connect.fundrise.com/ (AGENTS.md, skills, /llms.txt — all 404)
+  - https://fundrise.com/llms.txt (404)
+  - github.com/fundrise (zero public repositories)
+
+skills:
+- file: fundrise-onboard-client-and-invest.md
+  name: Onboard a Fundrise Client and place an Investment
+  description: >-
+    Onboard an end user onto Fundrise Connect as a Client, present the required offering
+    documents and acknowledgments, and place their first investment in a Fundrise offering.
+  api: openapi/fundrise-connect-openapi.yml
+  operations:
+  - CreateClient
+  - GetAccessToken
+  - GetOfferings
+  - GetOfferingDocuments
+  - GetInvestmentAcknowledgments
+  - PlaceInvestment
+  human_in_the_loop: required
+  consequence: financial
+
+- file: fundrise-liquidate-shares.md
+  name: Request and manage a Fundrise share liquidation
+  description: >-
+    Check which of a Client's Fundrise holdings can be liquidated, collect the required
+    acknowledgments, submit a share liquidation request, and cancel it if needed.
+  api: openapi/fundrise-connect-openapi.yml
+  operations:
+  - GetAccessToken
+  - GetHoldings
+  - GetLiquidationAcknowledgments
+  - CreateShareLiquidationRequest
+  - CancelShareLiquidationRequest
+  - GetTransactions
+  human_in_the_loop: required
+  consequence: financial
+
+- file: fundrise-read-portfolio-and-tax.md
+  name: Read a Fundrise Client's portfolio, transactions and tax forms
+  description: >-
+    Retrieve a Client's Fundrise holdings, transaction history and tax documents, and
+    enrich them with offering and NAV data — the read-only reporting flow, safe for agent
+    use.
+  api: openapi/fundrise-connect-openapi.yml
+  operations:
+  - GetAccessToken
+  - GetClient
+  - GetHoldings
+  - GetTransactions
+  - GetTransaction
+  - GetTaxForms
+  - GetOfferings
+  - GetHistoricalNav
+  human_in_the_loop: not-required
+  consequence: read
+
+coverage:
+  rest_operations: 17
+  operations_covered: 16
+  uncovered:
+  - operation: UpdateClient
+    reason: >-
+      Mutates an investor's identity and address of record. A single-operation profile
+      update does not warrant its own packaged flow; the guardrails are the same as
+      CreateClient in the onboarding skill.

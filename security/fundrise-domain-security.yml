@@ -1,0 +1,18 @@
+generated: '2026-08-04'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: fundrise.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct 12 23:59:59 2026 GMT
+  hsts: null
+- host: sandbox.fundrise.com
+  https: false
+domains:
+- domain: fundrise.com
+  dnssec: true
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine

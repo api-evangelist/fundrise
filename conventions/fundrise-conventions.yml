@@ -1,0 +1,230 @@
+generated: '2026-08-04'
+method: searched
+source: https://connect.fundrise.com/
+docs: https://connect.fundrise.com/
+api: openapi/fundrise-connect-openapi.yml
+notes: >-
+  Cross-cutting request/response semantics for the Fundrise Connect API. Every claim
+  below is taken from the published OpenAPI 3.1.0 document — its info.description
+  narrative (Errors, Request IDs, Idempotency, Versioning, Rate limiting) and its
+  operation/schema definitions. Nothing is inferred beyond what Fundrise states.
+
+style:
+  architecture: REST
+  description: >-
+    "The API is organized around REST. Our API has predictable resource-oriented URLs,
+    accepts form-encoded request bodies, returns JSON-encoded responses, and uses
+    standard HTTP response codes, authentication, and verbs."
+  response_media_type: application/json
+  resource_naming: singular-path-segments
+  path_shape: /v{n}/{resource}/{id}/{sub-resource}
+
+authentication:
+  style: dual-scheme
+  schemes:
+  - name: PartnerBasicAuthentication
+    type: http
+    scheme: basic
+    subject: Partner
+    note: >-
+      Username and password issued by Fundrise support. Used for Partner-context
+      operations — Client creation, Offerings, historical NAV, offering documents,
+      and access-token exchange.
+  - name: ClientBearerAuthentication
+    type: http
+    scheme: bearer
+    subject: Client
+    note: >-
+      An OAuth access token scoped to one Client. Used for all per-Client operations —
+      investments, liquidations, holdings, transactions, tax forms, client read/update.
+  token_acquisition:
+    operation: GetAccessToken
+    path: /v1/oauth/token
+    grant: refresh_token
+    refresh_token_issued_by: CreateClient
+    refresh_token_expiry: none
+    storage_requirement: >-
+      Fundrise requires refresh tokens and Partner passwords to be encrypted at rest
+      with access restricted to the services calling the API, and never exposed to a
+      Client or a Client device.
+  detail: authentication/fundrise-authentication.yml
+
+idempotency:
+  supported: true
+  mechanism: request-body-field
+  field: partnerReferenceId
+  header: null
+  scope:
+  - operation: CreateClient
+    path: /v1/client
+    method: post
+    required: false
+    note: >-
+      "An idempotency key to ensure duplicate clients are not created in the system
+      for a Partner. This is a unique ID from the Partner used to reference the Client
+      in their system. This should not contain PII."
+  - operation: PlaceInvestment
+    path: /v1/account/{accountId}/investment
+    method: post
+    required: true
+    note: >-
+      "An idempotency key to ensure duplicate Investments are not created in the system
+      for a Partner. This is a unique ID from the Partner used to reference the
+      Investment in their system."
+  documented_statement: >-
+    "For some POST endpoints, we require a Partner idempotency key to ensure operations
+    are not duplicated. For both Client creation and Investment placement, we require a
+    partnerReferenceId to ensure that Investments and Clients are not duplicated in our
+    system."
+  conflict_signal:
+    status: 409
+    operation: CreateClient
+    description: Conflict creating resource
+  retention: not-published
+  note: >-
+    Fundrise deviates from the common Idempotency-Key header convention (RFC draft
+    idempotency-key-header): the key is a first-class field on the request body and
+    doubles as the Partner's own foreign key for the created resource. It is therefore
+    permanent by construction rather than windowed, which is why no retention period is
+    published.
+
+pagination:
+  supported: false
+  note: >-
+    No pagination is declared anywhere in the OpenAPI — there are no page, offset,
+    cursor, or limit query parameters, and no envelope with paging metadata. Collection
+    operations (GetOfferings, GetTransactions, GetHoldings, GetTaxForms,
+    GetOfferingDocuments, acknowledgment lookups) return bare JSON arrays. Collections
+    are naturally bounded (a Client's holdings, a partner's open offerings), but
+    unbounded growth of GetTransactions is a real integration consideration.
+
+filtering:
+  supported: partial
+  parameters:
+  - operation: GetTaxForms
+    parameter: taxYear
+    in: query
+    note: Narrows tax documents to a single tax year.
+  - operation: GetTransaction
+    parameter: transactionType
+    in: path
+    note: One of INVESTMENT, LIQUIDATION, DIVIDEND.
+
+field_expansion:
+  supported: false
+  note: No expand / fields / include parameter exists in the spec.
+
+metadata:
+  supported: false
+  note: >-
+    No free-form metadata object. partnerReferenceId is the only Partner-controlled
+    correlation value, and Fundrise explicitly instructs that it must not contain PII.
+
+request_tracing:
+  supported: true
+  response_header: Request-Id
+  error_body_field: referenceId
+  documented_statement: >-
+    "Each API request has an associated request identifier. You can find this value in
+    the response headers, under Request-Id. This error will also be present in the error
+    response body under the field referenceId. If you need to contact us about a
+    specific request, providing the request identifier will ensure the fastest possible
+    resolution."
+  note: >-
+    referenceId is the only required field on the FundriseConnectError schema, so every
+    error response is traceable by construction.
+
+versioning:
+  scheme: uri-path
+  current: v1
+  documented_statement: >-
+    "API endpoints are versioned with path versioning. Each endpoint contains a version
+    path parameter e.g. (/v1/...). To release new functionality without impacting
+    existing customers, we will version endpoints and increment version numbers
+    accordingly."
+  media_type_versioning: false
+  header_versioning: false
+  detail: lifecycle/fundrise-lifecycle.yml
+
+error_envelope:
+  schema: FundriseConnectError
+  media_type: application/json
+  rfc9457: false
+  fields:
+  - name: referenceId
+    required: true
+    description: Unique reference ID generated for every request, for error tracing.
+  - name: code
+    required: false
+    description: >-
+      Numeric code (max 6 chars, string-typed) mapping to a specific validation error.
+      Present only on 4xx errors Fundrise considers programmatically resolvable; the
+      permitted values are defined per-operation in the schema definitions rather than
+      in one central registry.
+  - name: message
+    required: false
+    description: Human readable description of the error.
+  - name: validationErrors
+    required: false
+    description: >-
+      FieldErrorMap — an object mapping field names to an array of form validation
+      error messages.
+  documented_statement: >-
+    "Fundrise uses conventional HTTP response codes to indicate the success or failure
+    of an API request... Some 4xx errors that could be handled programmatically (e.g.,
+    an address is invalid) include an error code that briefly explains the error
+    reported."
+  detail: errors/fundrise-problem-types.yml
+
+rate_limiting:
+  enforced: true
+  dimensions:
+  - per-Client
+  - per-HTTP-method
+  published_limits: false
+  response_headers: not-published
+  retry_after: not-published
+  documented_statement: >-
+    "We enforce rate limiting on our public API to avoid DoS (denial of service) issues.
+    This rate limiting is enforced per Client and per HTTP method. If you are running
+    into rate limiting issues, please contact the support team via connect@fundrise.com."
+  detail: rate-limits/fundrise-rate-limits.yml
+
+money_and_precision:
+  monetary_amounts: string
+  share_quantities: string
+  note: >-
+    Amounts (amount, costBasis, currentValue, sharePrice, minimumInvestmentAmount) and
+    share quantities (SharePrecision) are typed as strings rather than numbers, which
+    is the correct choice for a financial API — it avoids IEEE-754 rounding on the wire.
+    Investment minimums and maximums are enforced per Transaction and returned on
+    OfferingResponse.
+
+consent_and_disclosure:
+  required: true
+  note: >-
+    Investments and liquidations cannot be placed until the Client has been presented
+    with, and has digitally acknowledged, the offering's documents and acknowledgments.
+    acknowledgedDocumentIds is a required field on InvestmentPlacementRequest and
+    allAcknowledgmentsAccepted is required on ShareLiquidationRequest. This is a
+    regulatory precondition encoded directly in the contract, not an optional courtesy —
+    any agent or integration must reproduce the disclosure step.
+
+access_control:
+  model: allowlist-per-partner
+  documented_statement: >-
+    "To ensure a safe, secure platform, Fundrise imposes strict access controls to all
+    APIs. As such, there may be services or capabilities documented that are inaccessible
+    with current permissions."
+  note: >-
+    A documented operation returning 403 is expected behaviour rather than a defect;
+    additional endpoints are granted by contacting connect@fundrise.com.
+
+cross_links:
+  authentication: authentication/fundrise-authentication.yml
+  scopes: scopes/fundrise-scopes.yml
+  errors: errors/fundrise-problem-types.yml
+  rate_limits: rate-limits/fundrise-rate-limits.yml
+  lifecycle: lifecycle/fundrise-lifecycle.yml
+  sandbox: sandbox/fundrise-sandbox.yml
+  data_model: data-model/fundrise-data-model.yml

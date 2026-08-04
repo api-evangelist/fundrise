@@ -1,0 +1,112 @@
+generated: '2026-08-04'
+method: searched
+source: https://fundrise.com/connect-api
+docs: https://connect.fundrise.com/
+api: openapi/fundrise-connect-openapi.yml
+notes: >-
+  Fundrise publishes a dedicated sandbox environment for the Connect API — it is the only
+  server declared in the OpenAPI — but does not publish any test values. No test card
+  numbers, magic identifiers, seeded Clients, fixture tooling or time simulation are
+  documented. Nothing is invented here; the unpublished items are recorded as gaps.
+
+environments:
+- name: Sandbox
+  base_url: https://sandbox.fundrise.com
+  declared_in: openapi servers[]
+  purpose: >-
+    "Test mode" — Fundrise states on the Connect API page that test mode functionality
+    does not affect live data.
+  access: gated
+  access_request: https://fundrise.com/connect-api/contact
+  anonymous_reachability: >-
+    Did not resolve or connect on anonymous probe (2026-08-04), consistent with a
+    partner-allowlisted environment rather than an open sandbox.
+- name: Production
+  base_url: https://api.fundrise.com
+  declared_in: >-
+    Not declared in the OpenAPI servers[] block. Identified from the token_endpoint of
+    https://fundrise.com/.well-known/openid-configuration
+    (https://api.fundrise.com/oauth/token). Anonymous /.well-known probes return 403.
+  access: gated
+
+separation_model:
+  style: separate-host
+  description: >-
+    Test and live are separated by hostname (sandbox.fundrise.com vs api.fundrise.com)
+    rather than by a key prefix or a mode flag on the credential. There is no documented
+    test-vs-live key prefix convention — Partner Basic credentials and Client refresh
+    tokens are issued per environment by Fundrise support.
+  key_prefix_convention: not-published
+  mode_header: not-published
+
+credentials:
+  issuance: >-
+    Partner username and password are provided by Fundrise support; Client refresh tokens
+    are issued by the CreateClient operation within whichever environment is being called.
+  self_service: false
+  note: >-
+    There is no self-service signup for sandbox credentials. A partner requests access via
+    the Connect API contact form or connect@fundrise.com, and Fundrise applies per-partner
+    endpoint permissions on top — documented capabilities may return 403 until granted.
+
+test_values:
+  published: false
+  test_cards: none-published
+  test_bank_accounts: none-published
+  magic_identifiers: none-published
+  seeded_clients: none-published
+  seeded_offerings: none-published
+  note: >-
+    No published test data of any kind. In sandbox, offeringId values must be discovered
+    at runtime from GetOfferings, accountId from the accounts[] array returned by
+    CreateClient, and documentId from GetOfferingDocuments — the same discovery path as
+    production.
+
+time_simulation:
+  supported: not-published
+  note: >-
+    No test clocks or time-travel tooling documented. This is a material gap for this
+    domain: holdings update daily with appreciation and accruing dividends
+    (GetHoldings), transactions settle asynchronously through
+    PENDING -> COMPLETE/FAILED, and tax forms are issued per tax year — none of which
+    can be exercised end-to-end without waiting or without a way to advance time.
+
+fixtures_and_triggers:
+  supported: not-published
+  note: >-
+    No documented way to force a transaction into COMPLETE or FAILED, to simulate a
+    liquidation settling, or to trigger a dividend. Combined with the absence of any
+    webhook or event surface, a partner integrating against sandbox has no published
+    mechanism to test asynchronous state transitions.
+
+safe_operations_in_sandbox:
+  note: >-
+    All 17 operations are available in sandbox subject to per-partner permissions. The
+    state-changing ones — CreateClient, UpdateClient, PlaceInvestment, CancelInvestment,
+    CreateShareLiquidationRequest, CancelShareLiquidationRequest — are the ones test mode
+    exists for, and PlaceInvestment and CreateClient are additionally protected by the
+    partnerReferenceId idempotency key.
+
+gaps:
+- No published test card, bank account or magic identifier values.
+- No test clocks or time simulation, despite daily NAV, accruing dividends and multi-day settlement.
+- No fixture or trigger tooling to force transaction status transitions.
+- No self-service sandbox signup — access is gated behind a contact form.
+- Sandbox host is not anonymously reachable, so the environment cannot be verified from outside.
+- Production host is absent from the OpenAPI servers[] block, so generated clients default to sandbox.
+
+x-evidence:
+- fetched: '2026-08-04'
+  url: https://fundrise.com/connect-api
+  http_status: 200
+  note: >-
+    Connect API product page; states test mode functionality that does not affect live
+    data, and links the access request form.
+- fetched: '2026-08-04'
+  url: https://connect.fundrise.com/
+  http_status: 200
+  note: OpenAPI servers[] declares https://sandbox.fundrise.com with description "Sandbox".
+- fetched: '2026-08-04'
+  url: https://fundrise.com/.well-known/openid-configuration
+  http_status: 200
+  note: token_endpoint identifies https://api.fundrise.com as the production host.

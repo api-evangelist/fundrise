@@ -1,0 +1,72 @@
+generated: '2026-08-04'
+method: searched
+source: https://fundrise.com/.well-known/openid-configuration
+docs: https://connect.fundrise.com/#tag/Authentication
+notes: >-
+  The Fundrise Connect OpenAPI declares no oauth2 securityScheme — both schemes are
+  HTTP (basic for Partners, bearer for Clients) — so 0-working/derive-oauth-scopes.py
+  produced nothing. Fundrise nevertheless runs a real OAuth surface, published two
+  ways, and this file records both rather than leaving the provider with no scope
+  artifact.
+
+  1. The consumer OAuth authorization server, advertised anonymously at
+     https://fundrise.com/.well-known/openid-configuration, publishes an explicit
+     scopes_supported list.
+  2. The Connect partner API issues Client-scoped access tokens from a non-expiring
+     refresh token via POST /v1/oauth/token (operationId GetAccessToken). Its
+     OAuth2AccessTokenResponse schema carries a `scope` field, but the OpenAPI does
+     not enumerate the permitted values, so no named partner scopes are asserted here.
+authorization_server:
+  issuer_host: fundrise.com
+  discovery: https://fundrise.com/.well-known/openid-configuration
+  authorization_endpoint: https://fundrise.com/oauth/authorize
+  token_endpoint: https://api.fundrise.com/oauth/token
+  response_types_supported:
+  - code
+  token_endpoint_auth_methods:
+  - client_secret_basic
+  grant_types_observed:
+  - authorization_code
+  - refresh_token
+scopes:
+- scope: openid
+  description: >-
+    OpenID Connect authentication — requests an ID token asserting the end user's
+    identity. Published in scopes_supported of the Fundrise OIDC discovery document.
+  flows:
+  - authorizationCode
+  sources:
+  - well-known/fundrise-openid-configuration.json
+- scope: offline_access
+  description: >-
+    Requests a refresh token so the client can obtain new access tokens without the
+    end user being present. Published in scopes_supported of the Fundrise OIDC
+    discovery document, and consistent with the non-expiring refresh token the
+    Connect API issues at Client creation.
+  flows:
+  - authorizationCode
+  sources:
+  - well-known/fundrise-openid-configuration.json
+connect_api_tokens:
+  operation: GetAccessToken
+  path: /v1/oauth/token
+  grant: refresh_token
+  response_schema: OAuth2AccessTokenResponse
+  scope_field_present: true
+  named_scopes_published: false
+  note: >-
+    Access tokens are scoped to a single Client rather than to named permission
+    scopes. Endpoint-level authorization is expressed instead by which of the two
+    security schemes an operation requires (PartnerBasicAuthentication vs
+    ClientBearerAuthentication), and Fundrise applies additional per-partner access
+    controls out of band — the Authentication tag states that documented capabilities
+    may be inaccessible until permissions are granted by connect@fundrise.com.
+x-evidence:
+- fetched: '2026-08-04'
+  url: https://fundrise.com/.well-known/openid-configuration
+  http_status: 200
+  content_type: application/json
+- fetched: '2026-08-04'
+  url: https://connect.fundrise.com/
+  http_status: 200
+  note: OpenAPI 3.1.0 extracted from the published Redocly documentation bundle.

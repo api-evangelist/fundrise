@@ -1,0 +1,2132 @@
+openapi: 3.1.0
+servers:
+- description: Sandbox
+  url: https://sandbox.fundrise.com
+info:
+  title: Fundrise Connect (External API)
+  version: 1.0.0
+  contact:
+    name: Fundrise Connect Support Team
+    email: connect@fundrise.com
+  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external\
+    \ API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>\
+    \ or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request\
+    \ bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>:\
+    \ This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide\
+    \ their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in\
+    \ the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes\
+    \ in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly\
+    \ explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined\
+    \ in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be\
+    \ present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n\
+    ### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId`\
+    \ to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`).\
+    \ To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners\
+    \ will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\n\
+    We enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please\
+    \ contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  x-logo:
+    url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
+    backgroundColor: '#FFFFFF'
+    altText: Fundrise
+    href: .
+tags:
+- name: Authentication
+  description: "### Getting access \nTo get started, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n### Terminology\n  - <strong>Client</strong>:\
+    \ This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide\
+    \ their End-Users or customers access to Fundrise assets.\n\n### Access issues\nTo ensure a safe, secure platform, Fundrise imposes strict access controls to all APIs. As such, there may be services\
+    \ or capabilities documented that are inaccessible with current permissions.  Contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> to gain\
+    \ permissions for additional endpoints or to receive customized support for specific issues or concerns.\n### Security Models\nFundrise's API supports two different HTTP security schemes:\n- PartnerBasicAuthentication\n\
+    - ClientBearerAuthentication\n\nThe appropriate security scheme per endpoint is identified in the documentation. \nPartnerBasicAuthentication and ClientBearerAuthentication use values that should be\
+    \ treated as sensitive data. Fundrise requires  encrypted storage of these values with necessary controls to limit access. All information returned must be treated in full compliance to the end-user\
+    \ agreements.\n\n#### PartnerBasicAuthentication \nAccess an endpoint using Partner credentials in HTTP Header. \n\n  PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username\
+    \ and password will be provided by Fundrise support. \n  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests\
+    \ to the Fundrise API.\n  The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.\n\n\n#### ClientBearerAuthentication\
+    \ \nAccess an endpoint using an OAuth access token associated with a specific Client. \n\n  ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token. \n\
+    \  Since access tokens are scoped to specific Clients, they identify and authenticate the Client in a request.\n\n\n  Access tokens can be obtained in <a href=\"#tag/Authentication/operation/GetAccessToken\"\
+    >Get Access Token</a> requests by using the refresh token flow.\n  OAuth refresh token are issued on <a href=\"#tag/Clients/operation/CreateClient\">Client Creation</a> and scoped specifically to that\
+    \ Client.\n  The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making\
+    \ requests to the Fundrise API.\n  Refresh tokens should not be exposed to a Client or any of their devices."
+- name: Offerings
+  description: "The Offerings API contains information about all Offerings available via Fundrise Connect and documents associated with those offerings. Each Offering has a status indicating whether or\
+    \ not they are available for investment. An `OPEN` status means the  Offering is ready for investment, while the `CLOSED` status indicates it is unavailable. \nThe response also contains the investment\
+    \ minimums and maximums for the specific fund. Currently open funds have <strong>$10</strong> minimums and <strong>$100,000</strong> maximums. Both minimum and maximum are enforced per Transaction.\n\
+    The Offering ID is the foreign key referenced in the <a href=\"#tag/Investments/operation/PlaceInvestment\">Place Investment</a> operation to indicate which Offering the user is investing in."
+- name: Clients
+  description: 'The Clients API provides operations for creating new Clients and updating fields for existing Clients.
+
+    The Client represents an End-User of the platform. Newly created Clients will have exactly one account with a single `accountId`. This `accountId` is used in the Place Investment step of this flow.
+    Currently multiple accounts are not supported in the system, but is on our long term roadmap to build.'
+- name: Acknowledgments
+  description: The Acknowledgments API provides acknowledgments needed to place Investments and Liquidations.
+- name: Investments
+  description: The Investment APIs provide operations for placing and cancelling Investments in various Offerings on behalf of an authenticated Client.
+- name: Liquidations
+  description: The Liquidations APIs provide operations for a Client to place a Liquidation request. A Liquidation request results in selling shares in exchange for dollars.
+- name: Transactions
+  description: The Transactions API provides operations for fetching Transactions (individual or bulk) on behalf of authenticated Clients.
+- name: Holdings
+  description: The Holdings API contains up-to-date information about the status and performance of a Client's holdings in Fundrise. This endpoint may be used to fetch holding information after a Client's
+    initial Transaction has been  completed. The response from this endpoint will update daily with underlying changes in appreciation and accruing dividends.
+- name: Tax Forms
+  description: The Tax Form API provides operations for fetching tax document information for a given tax year.
+- name: Workflow Example
+  description: "The following example provides a step-by-step explanation of the sequential calls involved in the process of onboarding a new Client and placing an Investment in an Offering. This example\
+    \ is intended to be a high level overview for illustrative purposes and is subject to modification pending future refinements to this spec.\n\n## Create A Client\n\n### 1. Create Client\nClient creation\
+    \ is required to perform any operations on this platform.  Clients are created via the <a href=\"#tag/Clients/operation/CreateClient\">Create Client</a> operation.\n\nThe operation linked defines a\
+    \ variety of fields that must be passed in order to create a Client. Of particular note is the `partnerReferenceId`, which should be a unique identifier used within your own application to identify\
+    \ this individual.  This `partnerReferenceId` helps Fundrise to create a unique identifier for this Client that is specific to your institution.\n\nUpon successful creation, a response body will be\
+    \ returned containing a `clientId`, `refreshToken`, and a list of `accounts`, each having a single field: `accountId`. \n\nNewly created Clients will have exactly one account with a single `accountId`.\
+    \ This `accountId` is used in the Place Investment step of this flow. Currently multiple accounts are not supported in the system, but is on our long term roadmap to build.\n\nThe `refreshToken` will\
+    \ be used in the next step of the flow to fetch an access token.  You will need to use this value to fetch access tokens, so please store the refresh token securely.  Access tokens will be required\
+    \ for all future operations requiring ClientBearerAuthentication as they are used to identify and authenticate a Client in a request.\n\n## Obtain An Access Token\n\n### 2. Get Access Token\nThe `refreshToken`\
+    \ returned from the prior step should be passed to the  <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> operation to fetch an access token. The access token serves to identify\
+    \ a specific Client and authenticate requests. This access token will need to be passed in the Authentication header of all subsequent requests made in this flow.\n\n## Place An Investment\n### 3. Obtain\
+    \ Offering ID\nIn order to place an Investment an `offeringId` must be obtained. The <a href=\"./#tag/Offerings/operation/GetOfferings\">Get Offerings</a> operation returns all Offerings eligible for\
+    \ Investment through this API. The `id` of one of the returned Offerings in the response body will need to be passed to the next operation in the flow.\n### 4. Get Offering Documents\nBefore an Investment\
+    \ can be placed, it is required to present the Client with all relevant documents and disclosures relevant to the particular Offering. The <a href=\".#tag/Offerings/operation/GetOfferingDocuments\"\
+    >Get Offering Documents</a> operation takes the Offering `id` from step #3 as a parameter to  determine and return all relevant documents. The IDs of those documents must be passed along in the post\
+    \ body of the Investment placement step as the field `acknowledgedDocumentIds` .\n### 5. Get Investment Acknowledgments\nBefore an Investment can be placed, it is required to present the Client with\
+    \ all relevant acknowledgments relevant to the particular Offering. The <a href=\"./#tag/Acknowledgments/operation/GetInvestmentAcknowledgments\">Get Investment Acknowledgments</a> operation takes the\
+    \ Offering `id` from step #3 as a parameter to  determine and return all relevant acknowledgments. These agreements must be presented to the End-User and digitally signed. Digitally signing means the\
+    \ Partner platform must display associated checkboxes  for each acknowledgement and require the user to check them to proceed.       \n### 6. Place Investment\nOnce the Client has been presented with\
+    \ the relevant documents and acknowledgments, an Investment can be placed via the <a href=\"#tag/Investments/operation/PlaceInvestment\">Place Investment</a> operation. This operation takes an `accountId`\
+    \ (referenced in the the Create Client step) as a request parameter. In addition to this `accountId` a request body must be sent containing the `acknowledgedDocumentIds` from <strong>Step 4</strong>,\
+    \ the  previously referenced `offeringId` and an `amount` in US Dollars representing the dollar value of shares that will be purchased."
+components:
+  parameters:
+    AccountIdPath:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated
+        with the request.
+    LiquidableQuery:
+      name: liquidable
+      in: query
+      required: false
+      description: A filter for requesting only holdings which are eligible for Liquidation.
+      schema:
+        type: boolean
+    OfferingIdPath:
+      name: offeringId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
+    OfferingIdQuery:
+      name: offeringId
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
+    OfferingIdsQuery:
+      name: offeringIds
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/Identifier'
+        description: The Offering IDs (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
+    ShareLiquidationRequestIdPath:
+      name: shareLiquidationRequestId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The share liquidation request ID (returned by the <a href="#tag/Liquidation/operation/CreateShareLiquidationRequest">Create Liquidation operation</a>) associated with the request.
+    TaxYearQuery:
+      name: taxYear
+      in: query
+      description: Tax year in which to search for tax forms.
+      required: false
+      schema:
+        type: integer
+    TransactionTypeQuery:
+      name: transactionType
+      in: query
+      description: Enum indicating the underlying object type that the Transaction represents.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TransactionTypeEnum'
+    AssetClassQuery:
+      name: assetClass
+      in: query
+      description: Enum indicating the underlying asset class that the Offering represents.
+      required: false
+      schema:
+        $ref: '#/components/schemas/AssetClassEnum'
+    TransactionTypePath:
+      in: path
+      name: transactionType
+      required: true
+      schema:
+        $ref: '#/components/schemas/TransactionTypeEnum'
+      description: The type associated with the Transaction ID.
+    TransactionIdPath:
+      in: path
+      name: transactionId
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from
+        the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction.
+  schemas:
+    AccountIdResponse:
+      title: Account ID Response
+      description: A Fundrise Client Account object containing the ID of created Account.
+      type: object
+      properties:
+        accountId:
+          description: Long-term persistent public identity of the Account with Fundrise.
+          type: string
+          format: int64
+    AddressRequest:
+      $ref: '#/components/schemas/Address'
+    AddressResponse:
+      $ref: '#/components/schemas/Address'
+    Address:
+      title: Address
+      description: An address object.
+      type: object
+      properties:
+        address1:
+          description: The street address.
+          minLength: 1
+          maxLength: 255
+          type: string
+        address2:
+          description: The second line of the street address.
+          maxLength: 255
+          type: string
+        city:
+          description: The City of the address.
+          minLength: 1
+          maxLength: 255
+          type: string
+        state:
+          description: The State abbreviation of the address.
+          minLength: 2
+          maxLength: 2
+          type: string
+          x-field-extra-annotation: '@Pattern(regexp = "(A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|PA|RI|S[CD]|T[NX]|UT|V[AT]|W[AIVY])", message = "must be a U.S. state
+            abbreviation")'
+        zip:
+          description: The ZIP code of the address.
+          minLength: 5
+          maxLength: 5
+          type: string
+          x-field-extra-annotation: '@Pattern(regexp = "[0-9]{5}", message = "Zip must be five digits")'
+        country:
+          description: The country of the address
+          minLength: 2
+          maxLength: 2
+          type: string
+          x-field-extra-annotation: '@Pattern(regexp = "^US$", message = "Country must be US")'
+      required:
+      - address1
+      - city
+      - state
+      - zip
+      - country
+    AssetClass:
+      title: Asset Class
+      description: The asset class of the offering.
+      type: object
+      properties:
+        assetClassType:
+          $ref: '#/components/schemas/AssetClassEnum'
+        assetClassLabel:
+          type: string
+          description: Human readable label for the asset class
+    AssetClassEnum:
+      title: Asset Class type
+      description: The asset class of the offering.
+      maxLength: 256
+      enum:
+      - REAL_ESTATE
+      - PRIVATE_CREDIT
+      - VENTURE
+    ClientCreationRequest:
+      title: Client Creation Request
+      description: A Fundrise Client Creation Request Object.
+      type: object
+      properties:
+        partnerReferenceId:
+          description: An idempotency key to ensure duplicate clients are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Client in their system. This
+            should not contain PII.
+          type: string
+          x-field-extra-annotation: '@NotBlank'
+        primaryEmail:
+          description: The Client's primary email address.
+          maxLength: 150
+          x-field-extra-annotation: '@NotBlank @Email'
+          type: string
+          format: email
+        firstName:
+          description: The Client's current first name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        lastName:
+          description: The Client's current last name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        taxId:
+          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
+          type: string
+          x-field-extra-annotation: '@NotBlank @Pattern(regexp = "([0-9]{9})", message = "must be a string containing 9 digits")'
+        primaryAddress:
+          $ref: '#/components/schemas/AddressRequest'
+          description: The Client's primary address.
+        dateOfBirth:
+          $ref: '#/components/schemas/Date'
+          description: The Client's date of birth.
+      required:
+      - partnerReferenceId
+      - primaryEmail
+      - firstName
+      - lastName
+      - taxId
+      - primaryAddress
+      - dateOfBirth
+    ClientCreationResponse:
+      title: Client Creation Response
+      description: A Fundrise Client Creation Response Object.
+      type: object
+      properties:
+        refreshToken:
+          description: A non expiring OAuth Refresh Token to enable API access on behalf of the newly created Client.  This should be securely stored and treated as if it were a password.
+          maxLength: 256
+          type: string
+        clientId:
+          description: Unique public identifier of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        accounts:
+          description: An array of accounts belonging to the Client object. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of
+            the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    ClientUpdateRequest:
+      description: A Fundrise Client Update Request Object.
+      properties:
+        primaryEmail:
+          description: The Client's email address.
+          maxLength: 150
+          type: string
+          format: email
+          x-field-extra-annotation: '@Email'
+        firstName:
+          description: The Client's current first name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        lastName:
+          description: The Client's current last name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        primaryAddress:
+          $ref: '#/components/schemas/AddressRequest'
+          description: Client's primary address.
+    ClientResponse:
+      description: A Fundrise Client Object.
+      properties:
+        clientId:
+          description: Long-term persistent public identity of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        primaryEmail:
+          description: The Client's primary email address.
+          maxLength: 256
+          type: string
+        firstName:
+          description: The Client's first name.
+          maxLength: 256
+          type: string
+        lastName:
+          description: The Client's last name.
+          maxLength: 256
+          type: string
+        taxId:
+          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
+          maxLength: 256
+          type: string
+        primaryAddress:
+          $ref: '#/components/schemas/AddressResponse'
+          description: Client's primary address.
+        dateOfBirth:
+          $ref: '#/components/schemas/Date'
+          description: The Client's date of birth.
+        accounts:
+          description: An array of accounts belonging to the Client. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    ClientUpdateResponse:
+      description: An updated Fundrise Client object.
+      allOf:
+      - $ref: '#/components/schemas/ClientResponse'
+    Date:
+      title: Date String
+      description: ISO 8601 full-date in format 'YYYY-MM-DD' according to [IETF RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14)
+      type: string
+      format: date
+      example: '2021-07-15'
+    DocumentResponse:
+      title: Document
+      description: A Fundrise Document.
+      type: object
+      properties:
+        documentId:
+          description: The unique Document ID.
+          type: string
+          format: int64
+        documentName:
+          maxLength: 2000
+          type: string
+        documentType:
+          $ref: '#/components/schemas/DocumentTypeEnum'
+        documentUrl:
+          maxLength: 2000
+          type: string
+    StringArray:
+      type: array
+      items:
+        type: string
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    OfferingHistoricalNavResponse:
+      title: Offering NAV Response
+      description: Historical Daily NAV for a Fundrise Offering.
+      type: object
+      properties:
+        offeringId:
+          description: The Offering ID
+          $ref: '#/components/schemas/Identifier'
+        historicalDailyNav:
+          type: array
+          description: The historical daily net asset values of the fund in USD.
+          items:
+            $ref: '#/components/schemas/OfferingNavResponse'
+      required:
+      - offeringId
+      - historicalDailyNav
+    OfferingResponse:
+      title: Offering Response
+      description: A Fundrise Offering.
+      type: object
+      properties:
+        currentPrice:
+          anyOf:
+          - type: 'null'
+          - $ref: '#/components/schemas/PriceResponse'
+        offeringId:
+          description: The Offering ID
+          $ref: '#/components/schemas/Identifier'
+        offeringName:
+          description: The Offering name.
+          maxLength: 2000
+          type: string
+        status:
+          $ref: '#/components/schemas/OfferingStatusEnum'
+        assetClass:
+          $ref: '#/components/schemas/AssetClass'
+        minimumInvestmentAmount:
+          description: The minimum amount that can be invested into the fund in USD.
+          type: string
+          format: double
+        maximumInvestmentAmount:
+          description: The maximum amount that can be invested into the fund in USD.
+          type: string
+          format: double
+        primaryObjective:
+          description: The main goal of the fund.
+          type: string
+          maxLength: 256
+        currentDistributionRate:
+          description: The current distribution rate of the fund. This represents the approximate annualized dividend percentage of the fund.
+          type: string
+          format: double
+      required:
+      - offeringId
+      - offeringName
+      - status
+      - assetClass
+      - minimumInvestmentAmount
+      - maximumInvestmentAmount
+      - primaryObjective
+      - currentDistributionRate
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    InvestmentPlacementRequest:
+      title: Investment Placement
+      type: object
+      description: An Investment placement request.
+      required:
+      - partnerReferenceId
+      - amount
+      - offeringId
+      - acknowledgedDocumentIds
+      properties:
+        partnerReferenceId:
+          description: An idempotency key to ensure duplicate Investments are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Investment in their system.
+          type: string
+          x-field-extra-annotation: '@NotBlank'
+        offeringId:
+          description: The Offering ID
+          $ref: '#/components/schemas/Identifier'
+        amount:
+          description: The amount in USD to be purchased. The maximum decimal places is 2.
+          type: string
+          format: double
+          x-field-extra-annotation: '@Min(10) @Max(100000) @Digits(integer = 999999, fraction = 2, message = "decimal places must be less than or equal to 2")'
+        acknowledgedDocumentIds:
+          type: array
+          description: A list of `InvestmentAcknowledgment` IDs representing signatures of said acknowledgments. Submission of these IDs indicates that the user has both signed and consents to the acknowledgment
+            agreements.
+          items:
+            $ref: '#/components/schemas/Identifier'
+    Acknowledgment:
+      properties:
+        acknowledgmentId:
+          $ref: '#/components/schemas/Identifier'
+        acknowledgmentText:
+          description: The text to be presented for the acknowledgment to be signed.
+          maxLength: 1000
+          type: string
+    AcknowledgmentResponse:
+      title: Acknowledgment
+      type: object
+      description: A response containing an acknowledgment needed by the End-User to perform an action.
+      allOf:
+      - $ref: '#/components/schemas/Acknowledgment'
+    DebitCreditTypeEnum:
+      title: Debit/Credit type
+      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
+      type: string
+      enum:
+      - DEBIT
+      - CREDIT
+    OAuth2AccessTokenResponse:
+      description: Contains information needed to leverage the Client Bearer Authentication security scheme. Values are sensitive and allow api calls on behalf of a specific Client. The access token is
+        to  be used in subsequent API calls protected by the Client Bearer Authentication schema. The access token is for individual Clients, and usage of the same token for multiple  Clients will cause
+        unintended actions within our API.
+      properties:
+        accessToken:
+          description: The access token.
+          type: string
+          example: HgHaJimFLx5WbPTWwvrw4ktJApo
+        refreshToken:
+          description: The refresh token.
+          type: string
+          example: HnGMTF2gVKQU-7IrCwhlXEEU0EY
+        scope:
+          description: The scopes granted to the access token.
+          type: string
+          example: PARTNER:READ PARTNER:WRITE
+        tokenType:
+          description: The token type, which will be "Bearer".
+          type: string
+          example: Bearer
+        expiresIn:
+          description: The amount of time in seconds until the access token expires.
+          type: string
+          format: int64
+          example: '3598'
+    PriceResponse:
+      title: Price Response
+      description: A Fundrise Offering Price.
+      type: object
+      properties:
+        price:
+          description: The Offering Price.
+          type: string
+          format: double
+        priceDate:
+          description: The effective date-time of the price.
+          type: string
+          format: date-time
+    HoldingResponse:
+      description: A summary of the Client's holdings in an offering.
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Offering ID.
+        shares:
+          allOf:
+          - $ref: '#/components/schemas/SharePrecision'
+          description: The number of shares that make up the Holding, net of Liquidations. The precision of the this number can be up to 6 decimal places.
+        costBasis:
+          description: The weighted average of the price paid to purchase the shares in this Holding. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        currentValue:
+          description: The current value of the Holding's shares and pending orders. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        pendingValue:
+          description: The value of the Holding's pending orders. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        settledValue:
+          description: The value of the Holding's shares. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        liquidable:
+          description: A boolean indicating whether or not the current shares are available for liquidation.
+          type: boolean
+        unpaidDistributions:
+          description: The unpaid distributions net of fees for the current Holding. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+      required:
+      - offeringId
+      - shares
+      - costBasis
+      - currentValue
+      - pendingValue
+      - settledValue
+      - liquidable
+      - unpaidDistributions
+    OfferingNavResponse:
+      title: Offering NAV Response
+      description: A historical daily NAV entry
+      properties:
+        effectiveDate:
+          description: The date the NAV was effective.
+          type: string
+          format: date-time
+        netAssetValuePerShare:
+          description: The share value.
+          type: string
+          format: double
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
+    ShareLiquidationOfferingRequest:
+      type: object
+      description: The fund information for the sale
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Fundrise Offering ID
+        shares:
+          allOf:
+          - $ref: '#/components/schemas/SharePrecision'
+          description: The fractional quantity of shares to liquidate. The precision of the this number can be up to 6 decimal places. The total quantity of liquididable shares for a given Offering can
+            be obtained from the <a href="#tag/Holdings/operation/GetHoldings">Get Offering Holdings</a> endpoint.
+          x-field-extra-annotation: '@Positive @Digits(integer = 999999, fraction = 6, message = "must be less than or equal to 6 decimal places")'
+      required:
+      - offeringId
+      - shares
+    ShareLiquidationRequest:
+      type: object
+      description: A request for a Fundrise share liquidation
+      properties:
+        allAcknowledgmentsAccepted:
+          description: An indication that acknowledgments have been accepted
+          type: boolean
+          x-field-extra-annotation: '@AssertTrue'
+          example: true
+        offerings:
+          description: A collection of shares being submitted for liquidation.
+          type: array
+          items:
+            $ref: '#/components/schemas/ShareLiquidationOfferingRequest'
+          x-field-extra-annotation: '@NotEmpty'
+          example:
+          - offeringId: '1'
+            shares: '10.000001'
+          - offeringId: '2'
+            shares: '25.000001'
+      required:
+      - allAcknowledgmentsAccepted
+      - offerings
+    TaxDocumentResponse:
+      title: Tax
+      description: Base entity for all IRS Tax forms
+      type: object
+      properties:
+        taxYear:
+          description: Year for which taxes are being paid
+          type: integer
+        documentId:
+          $ref: '#/components/schemas/Identifier'
+          description: Long-term persistent id for the tax form instance
+        documentUrl:
+          description: URL for accessing the document resource
+          type: string
+        documentTitle:
+          description: Title for the document
+          type: string
+    TransactionOfferingResponse:
+      title: Transaction Offering Response
+      description: An Offering included in a Transaction
+      type: object
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Offering ID
+        offeringName:
+          description: The Offering name.
+          maxLength: 2000
+          type: string
+        shares:
+          $ref: '#/components/schemas/SharePrecision'
+          description: The number of shares in the Transaction
+        sharePrice:
+          description: The value in USD per share at the time of processing.
+          type: string
+          format: double
+        amount:
+          description: 'The total amount in USD to be returned to the Client, net of fees.  For example, the `amount` to be returned is described by the following formula:
+
+
+            `amount = (shares * sharePrice) - fees`.'
+          type: string
+          format: double
+      required:
+      - offeringId
+      - offeringName
+    TransactionResponse:
+      title: TransactionResponse
+      description: An abstract response representing the core Transaction properties.
+      type: object
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/Identifier'
+          description: The ID of the Transaction
+        amount:
+          description: Total amount in USD.
+          type: string
+          format: double
+        transactionType:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        transactionDate:
+          description: The Transaction date.
+          type: string
+          format: date-time
+        description:
+          description: The Transaction description
+          maxLength: 2000
+          type: string
+        status:
+          $ref: '#/components/schemas/TransactionStatusEnum'
+        debitCreditMemo:
+          $ref: '#/components/schemas/DebitCreditTypeEnum'
+        fees:
+          description: The fees associated with the Transaction
+          type: string
+          format: double
+        offerings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionOfferingResponse'
+        isCancellable:
+          description: Boolean indicating whether or not the Transaction is cancellable.
+          type: boolean
+      required:
+      - transactionId
+      - transactionType
+      - transactionDate
+      - description
+      - status
+      - debitCreditMemo
+    TransactionStatusEnum:
+      title: Transaction Status
+      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not
+        successful. This is a terminal state. <br>'
+      type: string
+      enum:
+      - PENDING
+      - COMPLETE
+      - FAILED
+    TransactionTypeEnum:
+      title: Transaction Type
+      description: Enum representing the type of financial Transaction.
+      enum:
+      - INVESTMENT
+      - LIQUIDATION
+      - DIVIDEND
+    DocumentTypeEnum:
+      title: Document Type
+      description: Enum representing the document type.
+      maxLength: 256
+      enum:
+      - AGREEMENT
+      - ACKNOWLEDGMENT
+      - DISCLOSURE
+      - PROSPECTUS
+      - OFFERING_CIRCULAR
+      - OTHER
+      - STATEMENT
+      - TAX_FORM
+    OfferingStatusEnum:
+      title: Offering Status
+      description: The current status of the offering. `OPEN` indicates the Offering can be invested in while `CLOSED` indicates the Offering is unavailable.
+      maxLength: 256
+      enum:
+      - OPEN
+      - CLOSED
+  securitySchemes:
+    PartnerBasicAuthentication:
+      description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely.
+        At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices.
+        If the password is compromised please contact Fundrise support.
+      type: http
+      scheme: basic
+    ClientBearerAuthentication:
+      description: 'ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token.  Since access tokens are scoped to specific Clients, they identify and authenticate
+        the Client in a request.
+
+
+        Access tokens can be obtained in <a href="#tag/Authentication/operation/GetAccessToken">Get Access Token</a> requests by using the refresh token flow. OAuth refresh token are issued on <a href="#tag/Clients/operation/CreateClient">Client
+        Creation</a> and scoped specifically to that Client. The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest
+        and access restricted to services making requests to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their devices.'
+      type: http
+      scheme: bearer
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '403':
+      description: Customer is not permitted to access the resource
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+paths:
+  /v1/oauth/token:
+    post:
+      summary: Get Access Token
+      security:
+      - PartnerBasicAuthentication: []
+      description: "This endpoint is an OAuth 2.0 Token Endpoint that supports the refresh token flow to obtain active access tokens, which are needed to access secured endpoints with ClientBearerAuthentication.\
+        \ \n\nRefresh tokens are issued on <a href=\"#tag/Clients/operation/CreateClient\">Client Creation</a> and are scoped to that specific Client.  Refresh tokens will not expire and should only be\
+        \ used to obtain new access tokens. Refresh tokens should be stored securely. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise\
+        \ API. Refresh tokens should not be exposed to a Client or any of their devices.\n\nAccess tokens have a limited lifespan, which is indicated in the `expiresIn` attribute of the response. When an\
+        \ access token expires, obtain a new access token using this endpoint. Access tokens will be scoped to the specific Client that the refresh token was scoped to.\n\nNote, the refresh token will be\
+        \ returned in the response along with the access token. Since refresh tokens will not expire, this should be the same refresh token that was used in the request."
+      tags:
+      - Authentication
+      operationId: GetAccessToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                grantType:
+                  type: string
+                  description: OAuth Grant Type must be `refresh_token`.
+                  x-field-extra-annotation: '@NotBlank'
+                refreshToken:
+                  type: string
+                  description: The refresh token value.
+                  x-field-extra-annotation: '@NotBlank'
+              required:
+              - grantType
+              - refreshToken
+            examples:
+              Refresh:
+                value:
+                  grantType: refresh_token
+                  refreshToken: a1929bbf-acb1-430f-a87f-9b79a8cff1f4
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2AccessTokenResponse'
+        '400':
+          description: Invalid operation type, Improperly formatted fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                Invalid grant type:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                    message: Invalid grant type
+                Missing refresh token:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                    validationErrors:
+                      refreshToken:
+                      - must not be blank
+                      - must not be null
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/liquidation:
+    post:
+      security:
+      - ClientBearerAuthentication: []
+      description: "Creates a request to liquidate shares. \n\nIn order to place a Liquidation request, the holdings in question must be liquidable.  The liquidability of Holdings in any given Offering\
+        \ is determined by the `shares` field on the response from the <a href=\"#tag/Holdings/operation/GetHoldings\">Get Offering Holdings</a> endpoint. A non zero quantity of `shares` indicates that\
+        \ the Client holds non reduced shares in the given Offering (indicated by the `offeringId`) that can be liquidated.\n<strong>Liquidations are reviewed on a quarterly basis.</strong>   As such, Liquidations\
+        \ submitted in Q1, Q2, Q3, and Q4 will typically be processed in early April, early July, early October, and early January, respectively."
+      operationId: CreateShareLiquidationRequest
+      summary: Create Liquidation
+      tags:
+      - Liquidations
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareLiquidationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+              example:
+              - transactionId: '1'
+                transactionType: LIQUIDATION
+                transactionDate: '2023-02-20T00:00:00.000-05:00'
+                description: Share liquidation request
+                offerings:
+                - offeringId: '24'
+                  offeringName: Flagship Fund
+                  shares: '25.000001'
+                status: FAILED
+                isCancellable: false
+                debitCreditMemo: DEBIT
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+                type: object
+              examples:
+                MalformedFields:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    validationErrors:
+                      allAcknowledgmentsAccepted:
+                      - must not be blank
+                      - must not be null
+                      - must be true
+                      offerings:
+                      - must not be blank
+                      - must not be null
+                      offerings[0].offeringId:
+                      - must not be blank
+                      - must not be null
+                      offerings[0].shares:
+                      - must not be blank
+                      - must not be null
+                      - must be less than or equal to 6 decimal places
+                      - must be greater than 0
+                PendingTransfers:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100519'
+                    message: Account has pending transfers
+                LiquidationsDisabledForOffering:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100520'
+                    message: Liquidations are blocked for the provided offering
+                TooManySharesRequested:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100521'
+                    message: Account does not hold the quantity of shares requested for liquidation
+                InProcessLiquidationForOffering:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100523'
+                    message: Liquidation cannot be placed because there is an in process Liquidation for the provided fund
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                InvalidOfferingId:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200101'
+                    message: Invalid offeringId provided
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/liquidation/{shareLiquidationRequestId}/cancel:
+    put:
+      security:
+      - ClientBearerAuthentication: []
+      description: 'Cancels a request to liquidate shares.
+
+
+        In order to cancel a Liquidation Transaction, `isCancellable` (boolean field), must have a value of `true`.  Liquidations will typically remain cancellable up until the start of the processing period
+        for the respective quarter in which it was placed.'
+      operationId: CancelShareLiquidationRequest
+      summary: Cancel Liquidation
+      tags:
+      - Liquidations
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/ShareLiquidationRequestIdPath'
+      responses:
+        '200':
+          description: Liquidation cancelled successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                share-liquidation-response:
+                  value:
+                    transactionId: '1'
+                    transactionType: LIQUIDATION
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    description: Share liquidation request
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '25.000001'
+                    status: FAILED
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+                type: object
+              examples:
+                InProcessLiquidationForOffering:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100514'
+                    message: Liquidation is in an invalid status for cancellation
+                CancellationWindowClosed:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100516'
+                    message: Liquidation is outside of cancellation window
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                LiquidationNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100513'
+                    message: Liquidation not found
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/offerings:
+    get:
+      description: Returns a list of Fundrise Offerings accessible via this API. This endpoint supports a query parameter to filter Offerings for a specific asset class.  Not passing the query parameter
+        will return all available asset classes.
+      operationId: GetOfferings
+      parameters:
+      - $ref: '#/components/parameters/AssetClassQuery'
+      security:
+      - PartnerBasicAuthentication: []
+      summary: Get Offerings
+      tags:
+      - Offerings
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferingResponse'
+              example:
+              - offeringId: '1'
+                currentPrice:
+                  price: '10.0'
+                  priceDate: '2020-01-01T00:00:00Z'
+                offeringName: Income Interval Fund
+                status: OPEN
+                assetClass:
+                  assetClassType: PRIVATE_CREDIT
+                  assetClassLabel: Private Credit
+                minimumInvestmentAmount: '10.00'
+                maximumInvestmentAmount: '100000.00'
+                primaryObjective: Cash flow
+                currentDistributionRate: '.41'
+              - offeringId: '2'
+                offeringName: Flagship Real Estate Fund
+                status: OPEN
+                assetClass:
+                  assetClassType: REAL_ESTATE
+                  assetClassLabel: Real Estate
+                minimumInvestmentAmount: '10.00'
+                maximumInvestmentAmount: '100000.00'
+                primaryObjective: Appreciation
+                currentDistributionRate: '.41'
+              - offeringId: '3'
+                offeringName: Innovation Fund
+                status: CLOSED
+                assetClass:
+                  assetClassType: VENTURE
+                  assetClassLabel: Venture
+                minimumInvestmentAmount: '10.00'
+                maximumInvestmentAmount: '100000.00'
+                primaryObjective: Appreciation
+                currentDistributionRate: '.41'
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/offering/{offeringId}/nav:
+    get:
+      description: 'Returns the historical daily net asset values for a Fundrise Offering accessible via this API. '
+      operationId: GetHistoricalNav
+      parameters:
+      - $ref: '#/components/parameters/OfferingIdPath'
+      security:
+      - PartnerBasicAuthentication: []
+      summary: Get Historical Daily NAV
+      tags:
+      - Offerings
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferingHistoricalNavResponse'
+              example:
+                offeringId: '24'
+                historicalDailyNav:
+                - effectiveDate: '2023-01-02T00:00:00Z'
+                  netAssetValuePerShare: '10.03'
+                - effectiveDate: '2023-01-01T00:00:00Z'
+                  netAssetValuePerShare: '10.02'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                LiquidationNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200101'
+                    message: Invalid offeringId provided
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/offering/{offeringId}/documents:
+    get:
+      description: The documents API provides access to Fundrise Offering documentation to place Investments. When a user has selected what Offering they would like to invest in from the `GET /v1/offerings`
+        endpoint, the documents (typically a `SUBSCRIPTION_AGREEMENT` and `PROSPECTUS`  or `OFFERING_CIRCULAR`) need to be displayed to the user before investing into the Offering.
+      operationId: GetOfferingDocuments
+      security:
+      - PartnerBasicAuthentication: []
+      summary: Get Offering Documents
+      tags:
+      - Offerings
+      parameters:
+      - $ref: '#/components/parameters/OfferingIdPath'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentResponse'
+              examples:
+                investment-docs:
+                  value:
+                  - documentId: '1'
+                    documentName: Fundrise Equity eREIT Offering Circular (December 2022) Supp 1.pdf
+                    documentType: OFFERING_CIRCULAR
+                    documentUrl: https://d10cq78zmnjvsx.cloudfront.net/website-documents/a1b48469-6cab-4965-ad24-fcde28037d31/Fundrise%20Equity%20eREIT%20Offering%20Circular%20(December%202022)%20Supp%201.pdf
+                  - documentId: '2'
+                    documentName: Fundrise Equity eREIT Subscription Agreement (December 2022) - final.pdf
+                    documentType: AGREEMENT
+                    documentUrl: https://d10cq78zmnjvsx.cloudfront.net/reit-documents/45eee3fb-d77c-4804-aca2-f0c96e413e02/Fundrise%20Equity%20eREIT%20Subscription%20Agreement%20(December%202022)%20-%20final.pdf
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                LiquidationNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200102'
+                    message: Documents not found for provided offeringId
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/liquidation/acknowledgments:
+    get:
+      description: The Liquidation acknowledgments API provides access to Fundrise Liquidation acknowledgments required to submit Liquidation requests.  The acknowledgments must be displayed to the user
+        and the user must digitally sign the acknowledgments and submit the IDs when liquidating.  Digitally signing means the Partner platform must display associated checkboxes for each acknowledgement
+        and require the user to check them to proceed.
+      operationId: GetLiquidationAcknowledgments
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Liquidation Acknowledgments
+      tags:
+      - Acknowledgments
+      parameters:
+      - $ref: '#/components/parameters/OfferingIdsQuery'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AcknowledgmentResponse'
+              example:
+              - acknowledgmentId: '1'
+                acknowledgmentText: I certify that I am authorized to make these elections and that all information provided is true and accurate. I certify that I have read and understand the documentation
+                  associated with my fund's offer to repurchase my shares and I agree to be bound by all terms and conditions included therein.
+              - acknowledgmentId: '2'
+                acknowledgmentText: I agree that Fundrise Advisors, LLC is entitled to act on the instructions of this request, without further inquiry, and these instructions supersede and have priority
+                  over all previous instructions in respect to the shares requested for redemption or repurchase.
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                LiquidationNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200104'
+                    message: Liquidation acknowledgments not found for provided offeringIds
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/offering/{offeringId}/acknowledgments:
+    get:
+      description: This endpoint provides access to Fundrise Offering acknowledgments required to place Investments. When a user has selected what Offering they would like to invest in from the `GET /v1/offerings`
+        endpoint, the acknowledgments must be displayed to the user and the user must  digitally sign the acknowledgments and submit the IDs when investing into the Offering. Digitally signing means the
+        Partner platform must display associated checkboxes for each acknowledgement and require the user to check them to proceed.
+      operationId: GetInvestmentAcknowledgments
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Investment Acknowledgments
+      tags:
+      - Acknowledgments
+      parameters:
+      - $ref: '#/components/parameters/OfferingIdPath'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AcknowledgmentResponse'
+              example:
+              - acknowledgmentId: '1'
+                acknowledgmentText: I have reviewed each Offering Circular and Prospectus, reviewed and agree to each Subscription Agreement, and understand the risks associated with this offering.
+              - acknowledgmentId: '2'
+                acknowledgmentText: I recognize that my investment is in alternative assets which are fundamentally long-term, illiquid investments; that liquidations, if approved, are paid out quarterly
+                  for the eREITs and the funds registered under the Investment Company Act of 1940, and monthly after a minimum 60-day waiting period for the eFund; and, where possible, requests for liquidation
+                  may be suspended during periods of financial stress.
+        '400':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                LiquidationNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200103'
+                    message: offeringIds are required
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                LiquidationNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200103'
+                    message: Acknowledgments not found for provided offeringIds
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/holdings:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      description: 'Returns a collection containing all of the Client''s current holdings within Fundrise.  Filter on optional Offering ID to return holding on a specific Offering.
+
+        The `liquidable` fields indicates shareholdings that are available for liquidation. This is filterable by the `liquidable` query parameter.'
+      tags:
+      - Holdings
+      operationId: GetHoldings
+      summary: Get Offering Holdings
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/OfferingIdQuery'
+      - $ref: '#/components/parameters/LiquidableQuery'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HoldingResponse'
+              examples:
+                multi-offering:
+                  value:
+                  - offeringId: '1'
+                    currentValue: '10100.00'
+                    pendingValue: '100.00'
+                    settledValue: '10000.00'
+                    unpaidDistributions: '100.00'
+                    shares: '150.9'
+                    costBasis: '10.01'
+                    liquidable: false
+                  - offeringId: '2'
+                    currentValue: '100.00'
+                    pendingValue: '0.00'
+                    settledValue: '100.00'
+                    unpaidDistributions: '0'
+                    shares: '10.74'
+                    costBasis: '11.49'
+                    liquidable: true
+                  - offeringId: '3'
+                    currentValue: '2010.78'
+                    pendingValue: '10.00'
+                    settledValue: '2000.78'
+                    unpaidDistributions: '24.32'
+                    shares: '13.677401'
+                    costBasis: '15.01'
+                    liquidable: true
+                single-offering:
+                  value:
+                  - offeringId: '4'
+                    currentValue: '10100.00'
+                    pendingValue: '100.00'
+                    settledValue: '10000.00'
+                    unpaidDistributions: '100.00'
+                    shares: '200.000001'
+                    costBasis: '10.01'
+                    liquidable: false
+                no-holdings:
+                  value: []
+                liquidable:
+                  value:
+                  - offeringId: '1'
+                    currentValue: '2000.78'
+                    pendingValue: '0'
+                    settledValue: '2000.78'
+                    unpaidDistributions: '24.32'
+                    shares: '13.677401'
+                    costBasis: '10.01'
+                    liquidable: true
+        '204':
+          description: No active holding in specified Offering for Client
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/client:
+    post:
+      security:
+      - PartnerBasicAuthentication: []
+      summary: Create Client
+      description: "Creates a Client within the Fundrise application. \nA refresh token will be returned with this request which is scoped to the newly-created Client.  It is important to retain this refresh\
+        \ token as it is required to obtain access tokens via the <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> operation.\nAccess tokens will be required for ClientBearerAuthentication\
+        \ which secures other endpoints.  Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely, used only in server-to-server communication,\
+        \ and not exposed to the End-User."
+      operationId: CreateClient
+      tags:
+      - Clients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCreationRequest'
+            examples:
+              clientCreationRequest:
+                value:
+                  firstName: John
+                  lastName: Smith
+                  primaryEmail: jsmith@fundrise.com
+                  taxId: '218110123'
+                  dateOfBirth: '1980-01-31'
+                  primaryAddress:
+                    address1: 11 Dupont Cir NW
+                    address2: Floor 10
+                    city: Washington
+                    state: DC
+                    zip: '20036'
+                    country: US
+                  partnerReferenceId: '1'
+      responses:
+        '201':
+          description: Client created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientCreationResponse'
+              examples:
+                client:
+                  value:
+                    clientId: '1'
+                    refreshToken: 2b1a7986-a277-41e4-b153-688f84b6edcb
+                    accounts:
+                    - accountId: '12'
+        '400':
+          description: Invalid operation type, Improperly formatted Client fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                clientExists:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    validationErrors:
+                      partnerReferenceId:
+                      - must not be blank
+                      - must not be null
+                      primaryEmail:
+                      - must be a well-formed email address
+                      - must not be blank
+                      - must not be null
+                      firstName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      lastName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      taxId:
+                      - must not be blank
+                      - must not be null
+                      - must be a string containing 9 digits
+                      primaryAddress:
+                      - must not be blank
+                      - must not be null
+                      primaryAddress.address1:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.address2:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.city:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.state:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 2
+                      - must be a U.S. state abbreviation
+                      primaryAddress.zip:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Zip must be five digits
+                      primaryAddress.country:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Country must be US
+                      dateOfBirth:
+                      - must not be blank
+                      - must not be null
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '409':
+          description: Conflict creating resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                unexpectedError:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200100'
+                    message: Client already created for supplied partnerReferenceId
+        '500':
+          $ref: '#/components/responses/500'
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Client
+      description: Returns the Client object for the currently authenticated Client.
+      operationId: GetClient
+      tags:
+      - Clients
+      responses:
+        '200':
+          description: Client found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+              examples:
+                client:
+                  value:
+                    clientId: '1'
+                    primaryEmail: jsmith@fundrise.com
+                    firstName: John
+                    lastName: Smith
+                    taxId: '218110123'
+                    primaryAddress:
+                      address1: 11 Dupont Cir NW
+                      address2: Floor 10
+                      city: Washington
+                      state: DC
+                      zip: '20036'
+                      country: US
+                    dateOfBirth: '1980-02-24'
+                    accounts:
+                    - accountId: '12'
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Update Client
+      description: Update a Client's name, email, and address.
+      operationId: UpdateClient
+      tags:
+      - Clients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientUpdateRequest'
+            examples:
+              nameOnly:
+                value:
+                  firstName: Judith
+                  lastName: Jones
+              emailOnly:
+                value:
+                  primaryEmail: zappa@fundrise.com
+              addressOnly:
+                value:
+                  primaryAddress:
+                    address1: 11 Dupont Cir NW
+                    address2: Floor 10
+                    city: Washington
+                    state: DC
+                    country: US
+                    zip: '20036'
+              nameAndEmail:
+                value:
+                  firstName: Judith
+                  lastName: Jones
+                  primaryEmail: zappa@fundrise.com
+              allUpdatableFields:
+                value:
+                  firstName: John
+                  lastName: Smith
+                  primaryEmail: jsmith@fundrise.com
+                  primaryAddress:
+                    address1: 11 Dupont Cir NW
+                    address2: Floor 10
+                    city: Washington
+                    state: DC
+                    zip: '20036'
+                    country: US
+      responses:
+        '200':
+          description: Client updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUpdateResponse'
+              examples:
+                client:
+                  value:
+                    clientId: '1'
+                    primaryEmail: jsmith@fundrise.com
+                    firstName: John
+                    lastName: Smith
+                    taxId: '218110123'
+                    primaryAddress:
+                      address1: 11 Dupont Cir NW
+                      address2: Floor 10
+                      city: Washington
+                      state: DC
+                      zip: '20036'
+                      country: US
+                    dateOfBirth: '1991-05-25'
+                    accounts:
+                    - accountId: '12'
+        '400':
+          description: Invalid operation type, Improperly formatted Client fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                validationErrors:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    validationErrors:
+                      primaryEmail:
+                      - must be a well-formed email address
+                      - must not be blank
+                      - must not be null
+                      firstName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      lastName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      primaryAddress:
+                      - must not be blank
+                      - must not be null
+                      primaryAddress.address1:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.address2:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.city:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.state:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 2
+                      - must be a U.S. state abbreviation
+                      primaryAddress.zip:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Zip must be five digits
+                      primaryAddress.country:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Country must be US
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/investment:
+    post:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Place Investment
+      description: "Place an Investment in an Offering on behalf of a Client. \n\nNAV (net asset value, reflected as `sharePrice` in this response) is typically updated daily for the interval funds (Flagship\
+        \ Real Estate Fund and the Income Real Estate Fund).  As such, the `sharePrice` for Investments in interval funds will not be returned upon Investment placement in such funds via this endpoint.\
+        \ \n\nWith this specification, we are assuming that accounts on the Partner platform, at the time of onboarding, have linked & funded a central payment source with the ability to fund Investments\
+        \ placed."
+      operationId: PlaceInvestment
+      tags:
+      - Investments
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestmentPlacementRequest'
+            examples:
+              InvestmentPlacedSuccessfully:
+                value:
+                  partnerReferenceId: '2314'
+                  offeringId: '1'
+                  acknowledgedDocumentIds:
+                  - '1'
+                  - '2'
+                  amount: '24187.50'
+      responses:
+        '200':
+          description: Investment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                client:
+                  value:
+                    transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: CREDIT
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                MalformedFields:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    validationErrors:
+                      partnerReferenceId:
+                      - must not be blank
+                      - must not be null
+                      offeringId:
+                      - must not be blank
+                      - must not be null
+                      amount:
+                      - must not be blank
+                      - must not be null
+                      - must be greater than or equal to 10.00
+                      - must be less than or equal to 100000.00
+                      acknowledgedDocumentIds:
+                      - must not be blank
+                      - must not be null
+                InvalidDocumentIds:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100502'
+                    message: acknowledgedDocumentIds do not match those required
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                AccountFrozen:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c40
+                    code: '100500'
+                    message: Account is frozen
+                FullLiquidationInProgress:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c41
+                    code: '100501'
+                    message: Account has a full Liquidation request in progress and is ineligible for Investment placement
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                InvalidOfferingId:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200101'
+                    message: Invalid offeringId provided
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/investment/{transactionId}/cancel:
+    put:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Cancel Investment
+      description: "Cancel an Investment in an Offering on behalf of the currently authenticated Client. \n\nAn Investment may be cancelled up until 5:00pm on the day that the Investment was placed. If\
+        \ the Investment was placed after 5:00pm EST or on a non-business day, it may be cancelled prior to 5:00pm of the next business day."
+      operationId: CancelInvestment
+      tags:
+      - Investments
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/TransactionIdPath'
+      responses:
+        '200':
+          description: Investment cancelled successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                client:
+                  value:
+                    transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: FAILED
+                    isCancellable: false
+                    debitCreditMemo: CREDIT
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                InvestmentNotInCancellableState:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100510'
+                    message: Investment must have a PENDING status to cancel
+                InvestmentOutsideOfCancellationWindow:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '100511'
+                    message: Cancellation window is closed for this Investment
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                InvestmentNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ef-ad46-c7c52fff0c34
+                    code: '100512'
+                    message: Invalid investmentId provided
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/tax-forms:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      operationId: GetTaxForms
+      summary: Get tax forms
+      description: Get the full lists of tax document data available for a specific year for the current authorized Client. The tax document URLs are AWS presigned URLs that are <strong>valid for 5 minutes</strong>.
+      tags:
+      - Tax Forms
+      parameters:
+      - $ref: '#/components/parameters/TaxYearQuery'
+      - $ref: '#/components/parameters/AccountIdPath'
+      responses:
+        '200':
+          description: Array of metadata for all the tax document data available for the Client matching search criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaxDocumentResponse'
+              example:
+              - taxYear: 2021
+                documentId: '1'
+                documentUrl: https://d10cq78zmnjvsx.cloudfront.net/exaple-secured-tax-docs-path/1
+                documentTitle: Annual Tax Summary
+              - taxYear: 2022
+                documentId: '2'
+                documentUrl: https://d10cq78zmnjvsx.cloudfront.net/example-secured-tax-docs-path/2
+                documentTitle: Annual Tax Summary
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/transaction/{transactionType}/{transactionId}:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Transaction
+      description: Returns a Transaction by the by `transactionId`, on behalf of the currently authenticated Client.
+      operationId: GetTransaction
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/TransactionTypePath'
+      - $ref: '#/components/parameters/TransactionIdPath'
+      tags:
+      - Transactions
+      responses:
+        '200':
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                PendingInvestment:
+                  value:
+                    transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: CREDIT
+                SettlingInvestment:
+                  value:
+                    transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: COMPLETE
+                    isCancellable: false
+                    debitCreditMemo: CREDIT
+                PendingShareLiquidationRequest:
+                  value:
+                    transactionId: '13'
+                    transactionType: LIQUIDATION
+                    description: Liquidation request of Fundrise Offering
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '300.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: DEBIT
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          description: Transaction not found or account does not own transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                TransactionNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200105'
+                    message: Transaction does not exist or account does not own transaction
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/transactions:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Transactions
+      description: 'Returns all Transactions for the supplied accountId on behalf of the currently authenticated Client.  Transactions may be filtered on the optional `TransactionType` query parameter. '
+      operationId: GetTransactions
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/TransactionTypeQuery'
+      tags:
+      - Transactions
+      responses:
+        '200':
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                TransactionsResponse:
+                  value:
+                  - transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: CREDIT
+                  - transactionId: '12'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: false
+                    debitCreditMemo: CREDIT
+                  - transactionId: '13'
+                    transactionType: LIQUIDATION
+                    description: Liquidation request of Fundrise Offering
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '300.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: DEBIT
+                  - transactionId: '14'
+                    transactionType: LIQUIDATION
+                    description: Liquidation request of Fundrise Offering
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '300.015936'
+                    status: FAILED
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+                  - transactionId: '15'
+                    transactionType: LIQUIDATION
+                    description: Liquidation of Fundrise Offering
+                    amount: '10000.15'
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.00'
+                      shares: '300.015936'
+                      amount: '3000.15'
+                    - offeringId: '25'
+                      offeringName: Income Interval Fund
+                      sharePrice: '10.00'
+                      shares: '700.000000'
+                      amount: '7000.00'
+                    status: COMPLETE
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+                  - transactionId: '16'
+                    transactionType: DIVIDEND
+                    description: Dividend from Fundrise Offering
+                    amount: '200.85'
+                    transactionDate: '2023-04-02T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '1'
+                      offeringName: Flagship Fund
+                    status: COMPLETE
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'

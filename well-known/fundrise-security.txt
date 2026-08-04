@@ -1,0 +1,4 @@
+Contact: mailto:securitydisclosure@fundrise.com
+Encryption: https://fundrise.com/.well-known/security.txt.gpg
+Expires: 2030-02-20T00:00:00.000Z
+Preferred-Languages: en

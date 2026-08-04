@@ -1,0 +1,22 @@
+generated: '2026-08-04'
+method: derived
+source: openapi/fundrise-connect-openapi.yml
+provider: fundrise
+workflows:
+- file: fundrise-onboard-client-and-invest.yml
+  workflowId: onboard-client-and-place-investment
+  title: Fundrise Connect — onboard a Client and place an Investment
+  summary: >-
+    Create a Client, exchange the issued refresh token for a Client access token, resolve
+    an open Offering, fetch and present that Offering's documents and acknowledgments, then
+    place the Investment. Follows the sequence Fundrise publishes under its own "Workflow
+    Example" documentation tag; all six operationIds verified against the published
+    OpenAPI 3.1.0.
+  operations:
+  - CreateClient
+  - GetAccessToken
+  - GetOfferings
+  - GetOfferingDocuments
+  - GetInvestmentAcknowledgments
+  - PlaceInvestment
+  human_in_the_loop: required

@@ -1,0 +1,170 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Fundrise Connect API
+  version: 1.0.0
+extends: openapi/fundrise-connect-openapi.yml
+x-generated: '2026-08-04'
+x-method: generated
+x-source: >-
+  Derived from the Fundrise-published OpenAPI 3.1.0 plus the artifacts in this repository.
+  This overlay records API Evangelist's enhancements only — it never mutates the harvested
+  specification. Every value below is grounded in something Fundrise publishes.
+actions:
+
+- target: $.info
+  description: Attach API Evangelist provenance and cross-links to the artifacts derived from this spec.
+  update:
+    x-apievangelist-provider: fundrise
+    x-apievangelist-api: fundrise:fundrise-connect
+    x-apievangelist-source: https://connect.fundrise.com/
+    x-apievangelist-harvested: '2026-08-04'
+    x-apievangelist-harvest-note: >-
+      The specification is not served at a standalone URL. It is embedded as the
+      __redoc_state.spec.data object inside the Redocly documentation bundle at
+      https://connect.fundrise.com/ and was extracted verbatim from there.
+    x-apievangelist-artifacts:
+      authentication: authentication/fundrise-authentication.yml
+      scopes: scopes/fundrise-scopes.yml
+      conventions: conventions/fundrise-conventions.yml
+      errors: errors/fundrise-problem-types.yml
+      rate_limits: rate-limits/fundrise-rate-limits.yml
+      lifecycle: lifecycle/fundrise-lifecycle.yml
+      conformance: conformance/fundrise-conformance.yml
+      sandbox: sandbox/fundrise-sandbox.yml
+      data_model: data-model/fundrise-data-model.yml
+      agentic_access: agentic-access/fundrise-agentic-access.yml
+      skills: skills/_index.yml
+      arazzo: arazzo/fundrise-onboard-client-and-invest.yml
+
+- target: $.servers
+  description: >-
+    Record the production host. The published spec declares only the sandbox server, so a
+    client generated from it defaults to test mode. The production host is not invented —
+    it is the token_endpoint published in Fundrise's own OIDC discovery document.
+  update:
+    x-apievangelist-production-host: https://api.fundrise.com
+    x-apievangelist-production-host-evidence: >-
+      token_endpoint of https://fundrise.com/.well-known/openid-configuration (HTTP 200,
+      fetched 2026-08-04)
+    x-apievangelist-note: >-
+      servers[] contains only the Sandbox entry. Adding the production server to the
+      published spec would remove a real integration hazard.
+
+- target: $.info
+  description: Record the cross-cutting runtime semantics captured in conventions/, as machine-readable extensions.
+  update:
+    x-idempotency:
+      supported: true
+      mechanism: request-body-field
+      field: partnerReferenceId
+      header: null
+      operations:
+      - CreateClient
+      - PlaceInvestment
+      conflict_status: 409
+    x-request-tracing:
+      response_header: Request-Id
+      error_body_field: referenceId
+    x-versioning:
+      scheme: uri-path
+      current: v1
+    x-rate-limiting:
+      enforced: true
+      dimensions: [per-Client, per-HTTP-method]
+      published_limits: false
+      throttle_status_declared: false
+    x-pagination:
+      supported: false
+
+- target: $.components.schemas.FundriseConnectError
+  description: Mark the vendor error envelope and note the deviation from RFC 9457.
+  update:
+    x-apievangelist-error-envelope: true
+    x-apievangelist-rfc9457: false
+    x-apievangelist-note: >-
+      Served as application/json rather than application/problem+json. referenceId is the
+      only required member and is the value to quote to connect@fundrise.com.
+
+- target: $.components.schemas.Identifier
+  description: Note that all entity identifiers share one opaque string type.
+  update:
+    x-apievangelist-note: >-
+      Every entity id — clientId, offeringId, transactionId, documentId, acknowledgmentId —
+      resolves to this single opaque string schema. There is no typed prefix convention, so
+      identifiers are not self-describing and must be tracked with their entity type.
+
+- target: $.components.securitySchemes.PartnerBasicAuthentication
+  description: Flag the credential-handling obligations Fundrise states in prose.
+  update:
+    x-apievangelist-subject: Partner
+    x-apievangelist-credential-handling: >-
+      Encrypted at rest, access restricted to calling services, never exposed to a Client
+      or Client device.
+
+- target: $.components.securitySchemes.ClientBearerAuthentication
+  description: Record that this bearer token is OAuth-issued and how it is obtained.
+  update:
+    x-apievangelist-subject: Client
+    x-apievangelist-token-source: POST /v1/oauth/token (GetAccessToken)
+    x-apievangelist-grant: refresh_token
+    x-apievangelist-refresh-token-expiry: none
+    x-apievangelist-note: >-
+      Modelled as an http bearer scheme rather than an oauth2 scheme with declared flows,
+      so generated clients receive no flow metadata even though a real OAuth exchange
+      backs it.
+
+- target: $.paths['/v1/client'].post
+  description: Mark the idempotent create and its duplicate signal.
+  update:
+    x-idempotent: true
+    x-idempotency-field: partnerReferenceId
+    x-duplicate-status: 409
+    x-apievangelist-note: >-
+      A 409 means the partnerReferenceId is already known to Fundrise and the Client
+      exists. Treat it as a successful no-op — do not retry with a new key.
+
+- target: $.paths['/v1/account/{accountId}/investment'].post
+  description: Mark the highest-consequence operation in the API.
+  update:
+    x-idempotent: true
+    x-idempotency-field: partnerReferenceId
+    x-apievangelist-consequence: financial
+    x-apievangelist-preconditions:
+    - GetOfferings
+    - GetOfferingDocuments
+    - GetInvestmentAcknowledgments
+    x-apievangelist-note: >-
+      Moves real money into a private-market fund. The Client must first have been shown
+      and have digitally accepted the offering's documents and acknowledgments;
+      acknowledgedDocumentIds is a required field, so the disclosure step is a contract
+      precondition, not a courtesy. amount must fall between the offering's
+      minimumInvestmentAmount and maximumInvestmentAmount, enforced per Transaction.
+
+- target: $.paths['/v1/account/{accountId}/liquidation'].post
+  description: Mark the liquidation operation as financially consequential.
+  update:
+    x-apievangelist-consequence: financial
+    x-apievangelist-preconditions:
+    - GetLiquidationAcknowledgments
+    - GetHoldings
+    x-apievangelist-note: >-
+      Sells shares back for dollars. allAcknowledgmentsAccepted is required. Check
+      HoldingResponse.liquidable before offering the action — not every holding can be
+      liquidated on demand.
+
+- target: $.paths['/v1/account/{accountId}/holdings'].get
+  description: Note the freshness contract and the empty-portfolio response.
+  update:
+    x-apievangelist-freshness: daily
+    x-apievangelist-note: >-
+      Values update daily with appreciation and accruing dividends, so responses are not
+      real-time. A 204 is returned when the Client has no holdings yet — handle it as an
+      empty portfolio, not an error.
+
+- target: $.paths['/v1/account/{accountId}/transactions'].get
+  description: Flag the unbounded collection.
+  update:
+    x-apievangelist-note: >-
+      Returns a bare array with no pagination parameters. This is the collection most
+      likely to grow without bound over an account's life, and there is no published way
+      to page or filter it by date.

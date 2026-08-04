@@ -1,0 +1,53 @@
+generated: '2026-08-04'
+method: searched
+source: https://connect.fundrise.com/
+docs: https://connect.fundrise.com/
+api: openapi/fundrise-connect-openapi.yml
+notes: >-
+  Fundrise documents that rate limiting is enforced on the Connect API but publishes no
+  numeric limits, no response headers, and no throttling status code. Recorded here as a
+  documented-but-unquantified policy — nothing is invented.
+
+policy:
+  enforced: true
+  purpose: denial-of-service protection
+  dimensions:
+  - per-Client
+  - per-HTTP-method
+  documented_statement: >-
+    "We enforce rate limiting on our public API to avoid DoS (denial of service) issues.
+    This rate limiting is enforced per Client and per HTTP method. If you are running
+    into rate limiting issues, please contact the support team via connect@fundrise.com."
+  escalation_contact: connect@fundrise.com
+
+rate_limits: []
+
+signaling:
+  throttle_status_code: not-published
+  status_429_declared_in_spec: false
+  headers:
+    limit: not-published
+    remaining: not-published
+    reset: not-published
+    retry_after: not-published
+  note: >-
+    No 429 response is declared on any of the 17 operations in the OpenAPI, and no
+    rate-limit response headers are documented. A client cannot determine budget
+    remaining, and cannot distinguish a throttle from a generic failure without
+    inspecting the body.
+
+published_limits: false
+gaps:
+- Numeric request budgets and windows are not published.
+- No standard rate-limit response headers (RFC 9239 / draft-ietf-httpapi-ratelimit-headers) are documented.
+- No 429 response object exists in the OpenAPI, so throttling is invisible to generated clients.
+- Per-Client scoping means a Partner's aggregate throughput ceiling across many Clients is undefined.
+
+x-evidence:
+- fetched: '2026-08-04'
+  url: https://connect.fundrise.com/
+  http_status: 200
+  content_type: text/html
+  note: >-
+    Rate limiting narrative read from the info.description of the OpenAPI 3.1.0 document
+    published inside the Redocly documentation bundle.
