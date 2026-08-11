@@ -32,27 +32,17 @@ tags:
 - Fintech
 - Embedded Investing
 apis:
-- aid: fundrise:fundrise-connect
-  name: Fundrise Connect API
-  description: 'Fundrise Connect is Fundrise''s external partner API for Client onboarding
-    and investment into its alternative-asset offerings. It is organized around REST
-    with resource-oriented URLs, JSON responses and conventional HTTP status codes.
-    Partners authenticate with HTTP Basic credentials issued by Fundrise; per-Client
-    operations use an OAuth bearer access token obtained from a non-expiring refresh
-    token issued at Client creation. The surface covers Clients, Offerings (including
-    historical daily NAV and offering documents), Acknowledgments, Investments, Liquidations,
-    Holdings, Transactions and Tax Forms.'
+- aid: fundrise:fundrise-acknowledgments-api
+  name: Fundrise Acknowledgments API
+  description: >-
+    The Acknowledgments API provides acknowledgments needed to place Investments and Liquidations.
   humanURL: https://fundrise.com/connect-api
   baseURL: https://sandbox.fundrise.com
   tags:
-  - Investing
-  - Alternative Assets
-  - Onboarding
-  - Real Estate
-  - Private Credit
+  - Acknowledgments
   properties:
   - type: OpenAPI
-    url: openapi/fundrise-connect-openapi.yml
+    url: openapi/fundrise-acknowledgments-api-openapi.yml
   - type: Documentation
     url: https://connect.fundrise.com/
   - type: APIReference
@@ -81,12 +71,412 @@ apis:
     url: data-model/fundrise-data-model.yml
   - type: Conformance
     url: conformance/fundrise-conformance.yml
-  - type: Overlay
-    url: overlays/fundrise-connect-overlay.yaml
   - type: AgenticAccess
     url: agentic-access/fundrise-agentic-access.yml
   - type: Arazzo
-    name: Onboard a Client and place an Investment
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-authentication-api
+  name: Fundrise Authentication API
+  description: "### Getting access \nTo get started, please contact the support team via <a href=\"mailto:connect@fundrise.com\"\
+    \ target=\"_blank\">connect@fundrise.com</a>.\n### Terminology\n  - <strong>Client</strong>: This\
+    \ refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise\
+    \ assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide\
+    \ their End-Users or customers access to Fundrise assets.\n\n### Access issues\nTo ensure a safe,\
+    \ secure platform, Fundrise imposes strict access controls to all APIs. As such, there may be services\
+    \ or capabilities documented that are inaccessible with current permissions.  Contact the support\
+    \ team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> to gain\
+    \ permissions for additional endpoints or to receive customized support for specific issues or concerns.\n\
+    ### Security Models\nFundrise's API supports two different HTTP security schemes:\n- PartnerBasicAuthentication\n\
+    - ClientBearerAuthentication\n\nThe appropriate security scheme per endpoint is identified in the\
+    \ documentation. \nPartnerBasicAuthentication and ClientBearerAuthentication use values that should\
+    \ be treated as sensitive data. Fundrise requires  encrypted storage of these values with necessary\
+    \ controls to limit access. All information returned must be treated in full compliance to the end-user\
+    \ agreements.\n\n#### PartnerBasicAuthentication \nAccess an endpoint using Partner credentials in\
+    \ HTTP Header. \n\n  PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner\
+    \ username and password will be provided by Fundrise support. \n  The Partner password should be stored\
+    \ securely. At a minimum, it should be encrypted at-rest and access restricted to services making\
+    \ requests to the Fundrise API.\n  The Partner password should not be exposed to a Client or any of\
+    \ their devices. If the password is compromised please contact Fundrise support.\n\n\n#### ClientBearerAuthentication\
+    \ \nAccess an endpoint using an OAuth access token associated with a specific Client. \n\n  ClientBearerAuthentication\
+    \ is enforced by HTTP Bearer Authentication and requires an OAuth access token. \n  Since access tokens\
+    \ are scoped to specific Clients, they identify and authenticate the Client in a request.\n\n\n  Access\
+    \ tokens can be obtained in <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a>\
+    \ requests by using the refresh token flow.\n  OAuth refresh token are issued on <a href=\"#tag/Clients/operation/CreateClient\"\
+    >Client Creation</a> and scoped specifically to that Client.\n  The refresh tokens will not expire\
+    \ and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted\
+    \ at-rest and access restricted to services making requests to the Fundrise API.\n  Refresh tokens\
+    \ should not be exposed to a Client or any of their devices."
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-authentication-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-clients-api
+  name: Fundrise Clients API
+  description: >-
+    The Clients API provides operations for creating new Clients and updating fields for existing Clients.
+
+    The Client represents an End-User of the platform. Newly created Clients will have exactly one account
+    with a single `accountId`. This `accountId` is used in the Place Investment step of this flow. Currently
+    multiple accounts are not supported in the system, but is on our long term roadmap to build.
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Clients
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-clients-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-holdings-api
+  name: Fundrise Holdings API
+  description: >-
+    The Holdings API contains up-to-date information about the status and performance of a Client's holdings
+    in Fundrise. This endpoint may be used to fetch holding information after a Client's initial Transaction
+    has been  completed. The response from this endpoint will update daily with underlying changes in
+    appreciation and accruing dividends.
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Holdings
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-holdings-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-investments-api
+  name: Fundrise Investments API
+  description: >-
+    The Investment APIs provide operations for placing and cancelling Investments in various Offerings
+    on behalf of an authenticated Client.
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Investments
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-investments-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-liquidations-api
+  name: Fundrise Liquidations API
+  description: >-
+    The Liquidations APIs provide operations for a Client to place a Liquidation request. A Liquidation
+    request results in selling shares in exchange for dollars.
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Liquidations
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-liquidations-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-offerings-api
+  name: Fundrise Offerings API
+  description: "The Offerings API contains information about all Offerings available via Fundrise Connect\
+    \ and documents associated with those offerings. Each Offering has a status indicating whether or\
+    \ not they are available for investment. An `OPEN` status means the  Offering is ready for investment,\
+    \ while the `CLOSED` status indicates it is unavailable. \nThe response also contains the investment\
+    \ minimums and maximums for the specific fund. Currently open funds have <strong>$10</strong> minimums\
+    \ and <strong>$100,000</strong> maximums. Both minimum and maximum are enforced per Transaction.\n\
+    The Offering ID is the foreign key referenced in the <a href=\"#tag/Investments/operation/PlaceInvestment\"\
+    >Place Investment</a> operation to indicate which Offering the user is investing in."
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Offerings
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-offerings-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-tax-forms-api
+  name: Fundrise Tax Forms API
+  description: >-
+    The Tax Form API provides operations for fetching tax document information for a given tax year.
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Tax Forms
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-tax-forms-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
+    url: arazzo/fundrise-onboard-client-and-invest.yml
+  - type: Support
+    url: mailto:connect@fundrise.com
+- aid: fundrise:fundrise-transactions-api
+  name: Fundrise Transactions API
+  description: >-
+    The Transactions API provides operations for fetching Transactions (individual or bulk) on behalf
+    of authenticated Clients.
+  humanURL: https://fundrise.com/connect-api
+  baseURL: https://sandbox.fundrise.com
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/fundrise-transactions-api-openapi.yml
+  - type: Documentation
+    url: https://connect.fundrise.com/
+  - type: APIReference
+    url: https://connect.fundrise.com/
+  - type: GettingStarted
+    url: https://connect.fundrise.com/#tag/Authentication
+  - type: Authentication
+    url: authentication/fundrise-authentication.yml
+  - type: OAuthScopes
+    url: scopes/fundrise-scopes.yml
+  - type: Conventions
+    url: conventions/fundrise-conventions.yml
+  - type: Idempotency
+    url: conventions/fundrise-conventions.yml
+  - type: ErrorCatalog
+    url: errors/fundrise-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/fundrise-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/fundrise-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/fundrise-sandbox.yml
+  - type: DataModel
+    url: data-model/fundrise-data-model.yml
+  - type: Conformance
+    url: conformance/fundrise-conformance.yml
+  - type: AgenticAccess
+    url: agentic-access/fundrise-agentic-access.yml
+  - type: Arazzo
     url: arazzo/fundrise-onboard-client-and-invest.yml
   - type: Support
     url: mailto:connect@fundrise.com
@@ -101,6 +491,10 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: MCPServer
+  url: mcp/fundrise-mcp.yml
+- type: Overlay
+  url: overlays/fundrise-connect-overlay.yaml
 - type: Website
   url: https://fundrise.com/
 - type: DeveloperPortal
