@@ -1,0 +1,41 @@
+{
+  "provider": "fundrise",
+  "sources": [
+    "fundrise-acknowledgments-api-openapi.yml",
+    "fundrise-authentication-api-openapi.yml",
+    "fundrise-clients-api-openapi.yml",
+    "fundrise-holdings-api-openapi.yml",
+    "fundrise-investments-api-openapi.yml",
+    "fundrise-liquidations-api-openapi.yml",
+    "fundrise-offerings-api-openapi.yml",
+    "fundrise-tax-forms-api-openapi.yml",
+    "fundrise-transactions-api-openapi.yml"
+  ],
+  "outputs": [
+    "fundrise-acknowledgments-api-openapi.yml",
+    "fundrise-authentication-api-openapi.yml",
+    "fundrise-clients-api-openapi.yml",
+    "fundrise-holdings-api-openapi.yml",
+    "fundrise-investments-api-openapi.yml",
+    "fundrise-liquidations-api-openapi.yml",
+    "fundrise-offerings-api-openapi.yml",
+    "fundrise-tax-forms-api-openapi.yml",
+    "fundrise-transactions-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "fundrise-acknowledgments-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-authentication-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-clients-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-holdings-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-investments-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-liquidations-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-offerings-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-tax-forms-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "fundrise-transactions-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": []
+}

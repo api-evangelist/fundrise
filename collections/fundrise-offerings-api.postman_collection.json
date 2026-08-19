@@ -1,0 +1,770 @@
+{
+  "item": [
+    {
+      "id": "c1fdfc93-b933-4e05-b8e1-3cc072b11306",
+      "name": "Offerings",
+      "description": {
+        "content": "The Offerings API contains information about all Offerings available via Fundrise Connect and documents associated with those offerings. Each Offering has a status indicating whether or not they are available for investment. An `OPEN` status means the  Offering is ready for investment, while the `CLOSED` status indicates it is unavailable. \nThe response also contains the investment minimums and maximums for the specific fund. Currently open funds have <strong>$10</strong> minimums and <strong>$100,000</strong> maximums. Both minimum and maximum are enforced per Transaction.\nThe Offering ID is the foreign key referenced in the <a href=\"#tag/Investments/operation/PlaceInvestment\">Place Investment</a> operation to indicate which Offering the user is investing in.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "e9de8e83-66b3-4c40-b51b-700b175c76a1",
+          "name": "Get Offerings",
+          "request": {
+            "name": "Get Offerings",
+            "description": {
+              "content": "Returns a list of Fundrise Offerings accessible via this API. This endpoint supports a query parameter to filter Offerings for a specific asset class.  Not passing the query parameter will return all available asset classes.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "offerings"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "assetClass",
+                  "value": "<string>",
+                  "description": "Enum indicating the underlying asset class that the Offering represents."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUsername}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPassword}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "7139d8c8-0d76-4eba-89ae-8e2dc13f20ce",
+              "name": "A successful response.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offerings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "assetClass",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"offeringId\": \"1\",\n    \"currentPrice\": {\n      \"price\": \"10.0\",\n      \"priceDate\": \"2020-01-01T00:00:00Z\"\n    },\n    \"offeringName\": \"Income Interval Fund\",\n    \"status\": \"OPEN\",\n    \"assetClass\": {\n      \"assetClassType\": \"PRIVATE_CREDIT\",\n      \"assetClassLabel\": \"Private Credit\"\n    },\n    \"minimumInvestmentAmount\": \"10.00\",\n    \"maximumInvestmentAmount\": \"100000.00\",\n    \"primaryObjective\": \"Cash flow\",\n    \"currentDistributionRate\": \".41\"\n  },\n  {\n    \"offeringId\": \"2\",\n    \"offeringName\": \"Flagship Real Estate Fund\",\n    \"status\": \"OPEN\",\n    \"assetClass\": {\n      \"assetClassType\": \"REAL_ESTATE\",\n      \"assetClassLabel\": \"Real Estate\"\n    },\n    \"minimumInvestmentAmount\": \"10.00\",\n    \"maximumInvestmentAmount\": \"100000.00\",\n    \"primaryObjective\": \"Appreciation\",\n    \"currentDistributionRate\": \".41\"\n  },\n  {\n    \"offeringId\": \"3\",\n    \"offeringName\": \"Innovation Fund\",\n    \"status\": \"CLOSED\",\n    \"assetClass\": {\n      \"assetClassType\": \"VENTURE\",\n      \"assetClassLabel\": \"Venture\"\n    },\n    \"minimumInvestmentAmount\": \"10.00\",\n    \"maximumInvestmentAmount\": \"100000.00\",\n    \"primaryObjective\": \"Appreciation\",\n    \"currentDistributionRate\": \".41\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a31d46b7-dc2a-494d-91c1-8c0d123bf17d",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offerings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "assetClass",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "d8e921af-b0b5-446e-8bd9-59afb2359ac4",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offerings"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "assetClass",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "cd7d2583-1de5-4024-b60a-232b0a099da8",
+          "name": "Get Historical Daily NAV",
+          "request": {
+            "name": "Get Historical Daily NAV",
+            "description": {
+              "content": "Returns the historical daily net asset values for a Fundrise Offering accessible via this API. ",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "offering",
+                ":offeringId",
+                "nav"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<int64>",
+                  "key": "offeringId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUsername}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPassword}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "40eedaa4-cac8-4a18-9d1d-b0c333df7892",
+              "name": "A successful response.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "nav"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"offeringId\": \"24\",\n  \"historicalDailyNav\": [\n    {\n      \"effectiveDate\": \"2023-01-02T00:00:00Z\",\n      \"netAssetValuePerShare\": \"10.03\"\n    },\n    {\n      \"effectiveDate\": \"2023-01-01T00:00:00Z\",\n      \"netAssetValuePerShare\": \"10.02\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "86283839-044b-4880-a4c4-08fe0da70b64",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "nav"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "b840907a-f1fb-4d59-9bf0-9cd04543a12a",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "nav"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200101\",\n  \"message\": \"Invalid offeringId provided\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a4f2b065-fb29-418e-b2a1-7de55956f951",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "nav"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "5407ef1a-02d2-4a07-ab22-95adc9484187",
+          "name": "Get Offering Documents",
+          "request": {
+            "name": "Get Offering Documents",
+            "description": {
+              "content": "The documents API provides access to Fundrise Offering documentation to place Investments. When a user has selected what Offering they would like to invest in from the `GET /v1/offerings` endpoint, the documents (typically a `SUBSCRIPTION_AGREEMENT` and `PROSPECTUS`  or `OFFERING_CIRCULAR`) need to be displayed to the user before investing into the Offering.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "offering",
+                ":offeringId",
+                "documents"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<int64>",
+                  "key": "offeringId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUsername}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPassword}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "9ccfeee9-3ca0-4da2-bf7a-b6c73375a21f",
+              "name": "A successful response.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "documents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"documentId\": \"1\",\n    \"documentName\": \"Fundrise Equity eREIT Offering Circular (December 2022) Supp 1.pdf\",\n    \"documentType\": \"OFFERING_CIRCULAR\",\n    \"documentUrl\": \"https://d10cq78zmnjvsx.cloudfront.net/website-documents/a1b48469-6cab-4965-ad24-fcde28037d31/Fundrise%20Equity%20eREIT%20Offering%20Circular%20(December%202022)%20Supp%201.pdf\"\n  },\n  {\n    \"documentId\": \"2\",\n    \"documentName\": \"Fundrise Equity eREIT Subscription Agreement (December 2022) - final.pdf\",\n    \"documentType\": \"AGREEMENT\",\n    \"documentUrl\": \"https://d10cq78zmnjvsx.cloudfront.net/reit-documents/45eee3fb-d77c-4804-aca2-f0c96e413e02/Fundrise%20Equity%20eREIT%20Subscription%20Agreement%20(December%202022)%20-%20final.pdf\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "de81ae10-d8c0-4eee-a313-91e7f04e3c4e",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "documents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "12f22bc5-0523-4010-a74a-ee54ed050b87",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "documents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200102\",\n  \"message\": \"Documents not found for provided offeringId\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1ab74d58-60de-483f-b8b0-38e87eea5474",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "documents"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.fundrise.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "0012bee7-556d-47a0-8e98-de5fe300de0d",
+    "name": "Fundrise Connect (External API) Offerings API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n\nContact Support:\n Name: Fundrise Connect Support Team\n Email: connect@fundrise.com",
+      "type": "text/plain"
+    }
+  }
+}

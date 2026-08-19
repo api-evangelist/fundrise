@@ -1,0 +1,72 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Clients API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Clients",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Client",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/client",
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns the Client object for the currently authenticated Client."
+        },
+        {
+          "info": {
+            "name": "Create Client",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.fundrise.com/v1/client",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "Creates a Client within the Fundrise application. \nA refresh token will be returned with this request which is scoped to the newly-created Client.  It is important to retain this refresh token as it is required to obtain access tokens via the <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> operation.\nAccess tokens will be required for ClientBearerAuthentication which secures other endpoints.  Refresh tokens will not expire and should only be used to obtain new access "
+        },
+        {
+          "info": {
+            "name": "Update Client",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://sandbox.fundrise.com/v1/client",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Update a Client's name, email, and address."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

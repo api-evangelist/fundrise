@@ -1,0 +1,878 @@
+{
+  "item": [
+    {
+      "id": "0e671515-e6e6-437e-b6d5-46029be33415",
+      "name": "Clients",
+      "description": {
+        "content": "The Clients API provides operations for creating new Clients and updating fields for existing Clients.\nThe Client represents an End-User of the platform. Newly created Clients will have exactly one account with a single `accountId`. This `accountId` is used in the Place Investment step of this flow. Currently multiple accounts are not supported in the system, but is on our long term roadmap to build.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "829805c5-0981-47af-a530-4d45079eee2e",
+          "name": "Create Client",
+          "request": {
+            "name": "Create Client",
+            "description": {
+              "content": "Creates a Client within the Fundrise application. \nA refresh token will be returned with this request which is scoped to the newly-created Client.  It is important to retain this refresh token as it is required to obtain access tokens via the <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> operation.\nAccess tokens will be required for ClientBearerAuthentication which secures other endpoints.  Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely, used only in server-to-server communication, and not exposed to the End-User.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "client"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUsername}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPassword}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partnerReferenceId\": \"<string>\",\n  \"primaryEmail\": \"<email>\",\n  \"firstName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"taxId\": \"<string>\",\n  \"primaryAddress\": {\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"address2\": \"<string>\"\n  },\n  \"dateOfBirth\": \"<date>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "6a5da359-10fd-44a0-8918-ec371a24e62b",
+              "name": "Client created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"taxId\": \"218110123\",\n  \"dateOfBirth\": \"1980-01-31\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"partnerReferenceId\": \"1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"clientId\": \"1\",\n  \"refreshToken\": \"2b1a7986-a277-41e4-b153-688f84b6edcb\",\n  \"accounts\": [\n    {\n      \"accountId\": \"12\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5b6a2240-2058-4745-9f8c-785811e7a6b6",
+              "name": "Invalid operation type, Improperly formatted Client fields",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"taxId\": \"218110123\",\n  \"dateOfBirth\": \"1980-01-31\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"partnerReferenceId\": \"1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"validationErrors\": {\n    \"partnerReferenceId\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"primaryEmail\": [\n      \"must be a well-formed email address\",\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"firstName\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 2 and 150\"\n    ],\n    \"lastName\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 2 and 150\"\n    ],\n    \"taxId\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"must be a string containing 9 digits\"\n    ],\n    \"primaryAddress\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"primaryAddress.address1\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 1 and 255\"\n    ],\n    \"primaryAddress.address2\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 1 and 255\"\n    ],\n    \"primaryAddress.city\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 1 and 255\"\n    ],\n    \"primaryAddress.state\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 2 and 2\",\n      \"must be a U.S. state abbreviation\"\n    ],\n    \"primaryAddress.zip\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 5 and 5\",\n      \"Zip must be five digits\"\n    ],\n    \"primaryAddress.country\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 5 and 5\",\n      \"Country must be US\"\n    ],\n    \"dateOfBirth\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "008b6652-fd60-499c-ba8e-9fe9fb4d89ab",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"taxId\": \"218110123\",\n  \"dateOfBirth\": \"1980-01-31\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"partnerReferenceId\": \"1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "577dbb1f-0212-4bfe-859c-daa39479e2e5",
+              "name": "Customer is not permitted to access the resource",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"taxId\": \"218110123\",\n  \"dateOfBirth\": \"1980-01-31\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"partnerReferenceId\": \"1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "3b5389a8-c16b-4259-afee-97823ae2e2eb",
+              "name": "Conflict creating resource",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"taxId\": \"218110123\",\n  \"dateOfBirth\": \"1980-01-31\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"partnerReferenceId\": \"1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200100\",\n  \"message\": \"Client already created for supplied partnerReferenceId\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "77a05001-cf11-415c-9d06-2b26b014260c",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"taxId\": \"218110123\",\n  \"dateOfBirth\": \"1980-01-31\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"partnerReferenceId\": \"1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "04d079d7-9e9c-49eb-b3a0-75ca3fbe96e6",
+          "name": "Get Client",
+          "request": {
+            "name": "Get Client",
+            "description": {
+              "content": "Returns the Client object for the currently authenticated Client.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "client"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "29c3fa67-887f-4fc7-bf2a-8120ae43c586",
+              "name": "Client found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"clientId\": \"1\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"taxId\": \"218110123\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"dateOfBirth\": \"1980-02-24\",\n  \"accounts\": [\n    {\n      \"accountId\": \"12\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "21a6bc60-bcca-41a6-8117-2680e4eaf49e",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "c9dd3429-980e-49a4-b8c9-a589166cde7d",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "534534f0-03fd-4315-9568-213bf6bb59bc",
+          "name": "Update Client",
+          "request": {
+            "name": "Update Client",
+            "description": {
+              "content": "Update a Client's name, email, and address.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "client"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primaryEmail\": \"<email>\",\n  \"firstName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"primaryAddress\": {\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"address2\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a44e8c0f-fbdc-4cdf-ab2c-b815569b5741",
+              "name": "Client updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Judith\",\n  \"lastName\": \"Jones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"clientId\": \"1\",\n  \"primaryEmail\": \"jsmith@fundrise.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"taxId\": \"218110123\",\n  \"primaryAddress\": {\n    \"address1\": \"11 Dupont Cir NW\",\n    \"address2\": \"Floor 10\",\n    \"city\": \"Washington\",\n    \"state\": \"DC\",\n    \"zip\": \"20036\",\n    \"country\": \"US\"\n  },\n  \"dateOfBirth\": \"1991-05-25\",\n  \"accounts\": [\n    {\n      \"accountId\": \"12\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "31ebc910-c1ab-468b-9f55-c60954638799",
+              "name": "Invalid operation type, Improperly formatted Client fields",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Judith\",\n  \"lastName\": \"Jones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"validationErrors\": {\n    \"primaryEmail\": [\n      \"must be a well-formed email address\",\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"firstName\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 2 and 150\"\n    ],\n    \"lastName\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 2 and 150\"\n    ],\n    \"primaryAddress\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"primaryAddress.address1\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 1 and 255\"\n    ],\n    \"primaryAddress.address2\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 1 and 255\"\n    ],\n    \"primaryAddress.city\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 1 and 255\"\n    ],\n    \"primaryAddress.state\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 2 and 2\",\n      \"must be a U.S. state abbreviation\"\n    ],\n    \"primaryAddress.zip\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 5 and 5\",\n      \"Zip must be five digits\"\n    ],\n    \"primaryAddress.country\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"size must be between 5 and 5\",\n      \"Country must be US\"\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c98e1880-c6df-4c60-b616-0ec68332e0d5",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Judith\",\n  \"lastName\": \"Jones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7a3e8697-8afa-4d61-8cc6-cae8e1123d74",
+              "name": "Customer is not permitted to access the resource",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Judith\",\n  \"lastName\": \"Jones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7ac47bbc-00d1-4b6e-a80e-5b6e9635dcb6",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "client"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Judith\",\n  \"lastName\": \"Jones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.fundrise.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "0eda1be2-5132-4366-a4f4-ac5d48469b39",
+    "name": "Fundrise Connect (External API) Clients API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n\nContact Support:\n Name: Fundrise Connect Support Team\n Email: connect@fundrise.com",
+      "type": "text/plain"
+    }
+  }
+}

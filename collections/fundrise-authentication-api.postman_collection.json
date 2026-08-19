@@ -1,0 +1,351 @@
+{
+  "item": [
+    {
+      "id": "8852b27d-f181-46fd-85e8-d8d24ce753fa",
+      "name": "Authentication",
+      "description": {
+        "content": "### Getting access \nTo get started, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n### Terminology\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Access issues\nTo ensure a safe, secure platform, Fundrise imposes strict access controls to all APIs. As such, there may be services or capabilities documented that are inaccessible with current permissions.  Contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> to gain permissions for additional endpoints or to receive customized support for specific issues or concerns.\n### Security Models\nFundrise's API supports two different HTTP security schemes:\n- PartnerBasicAuthentication\n- ClientBearerAuthentication\n\nThe appropriate security scheme per endpoint is identified in the documentation. \nPartnerBasicAuthentication and ClientBearerAuthentication use values that should be treated as sensitive data. Fundrise requires  encrypted storage of these values with necessary controls to limit access. All information returned must be treated in full compliance to the end-user agreements.\n\n#### PartnerBasicAuthentication \nAccess an endpoint using Partner credentials in HTTP Header. \n\n  PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support. \n  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API.\n  The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.\n\n\n#### ClientBearerAuthentication \nAccess an endpoint using an OAuth access token associated with a specific Client. \n\n  ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token. \n  Since access tokens are scoped to specific Clients, they identify and authenticate the Client in a request.\n\n\n  Access tokens can be obtained in <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> requests by using the refresh token flow.\n  OAuth refresh token are issued on <a href=\"#tag/Clients/operation/CreateClient\">Client Creation</a> and scoped specifically to that Client.\n  The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise API.\n  Refresh tokens should not be exposed to a Client or any of their devices.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6d4a6cce-782d-4e14-b01c-cfb178479429",
+          "name": "Get Access Token",
+          "request": {
+            "name": "Get Access Token",
+            "description": {
+              "content": "This endpoint is an OAuth 2.0 Token Endpoint that supports the refresh token flow to obtain active access tokens, which are needed to access secured endpoints with ClientBearerAuthentication. \n\nRefresh tokens are issued on <a href=\"#tag/Clients/operation/CreateClient\">Client Creation</a> and are scoped to that specific Client.  Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their devices.\n\nAccess tokens have a limited lifespan, which is indicated in the `expiresIn` attribute of the response. When an access token expires, obtain a new access token using this endpoint. Access tokens will be scoped to the specific Client that the refresh token was scoped to.\n\nNote, the refresh token will be returned in the response along with the access token. Since refresh tokens will not expire, this should be the same refresh token that was used in the request.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "oauth",
+                "token"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUsername}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPassword}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grantType\": \"<string>\",\n  \"refreshToken\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "6782ea70-ba6f-42da-9181-42fc49613390",
+              "name": "OK",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "oauth",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grantType\": \"refresh_token\",\n  \"refreshToken\": \"a1929bbf-acb1-430f-a87f-9b79a8cff1f4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"accessToken\": \"HgHaJimFLx5WbPTWwvrw4ktJApo\",\n  \"refreshToken\": \"HnGMTF2gVKQU-7IrCwhlXEEU0EY\",\n  \"scope\": \"PARTNER:READ PARTNER:WRITE\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": \"3598\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dff4d03a-7f4a-43ff-960b-5008d3809de2",
+              "name": "Invalid operation type, Improperly formatted fields",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "oauth",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grantType\": \"refresh_token\",\n  \"refreshToken\": \"a1929bbf-acb1-430f-a87f-9b79a8cff1f4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Invalid grant type\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1c217c40-b7ba-44d1-b054-462b3facb7a7",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "oauth",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grantType\": \"refresh_token\",\n  \"refreshToken\": \"a1929bbf-acb1-430f-a87f-9b79a8cff1f4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "328c90e8-00be-4ed7-a8bf-8aaa86a4653b",
+              "name": "Customer is not permitted to access the resource",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "oauth",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grantType\": \"refresh_token\",\n  \"refreshToken\": \"a1929bbf-acb1-430f-a87f-9b79a8cff1f4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a58c99d0-14e2-432c-bad5-5574342212f9",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "oauth",
+                    "token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: basic",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Basic <credentials>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grantType\": \"refresh_token\",\n  \"refreshToken\": \"a1929bbf-acb1-430f-a87f-9b79a8cff1f4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.fundrise.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "6d190668-54b7-4bea-85fa-68d597c42aa1",
+    "name": "Fundrise Connect (External API) Authentication API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n\nContact Support:\n Name: Fundrise Connect Support Team\n Email: connect@fundrise.com",
+      "type": "text/plain"
+    }
+  }
+}

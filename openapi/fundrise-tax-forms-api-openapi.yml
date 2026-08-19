@@ -1,0 +1,154 @@
+openapi: 3.2.0
+info:
+  title: Fundrise Connect (External API) Tax Forms API
+  version: 1.0.0
+  contact:
+    name: Fundrise Connect Support Team
+    email: connect@fundrise.com
+  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  x-logo:
+    url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
+    backgroundColor: '#FFFFFF'
+    altText: Fundrise
+    href: .
+servers:
+- description: Sandbox
+  url: https://sandbox.fundrise.com
+tags:
+- name: Tax Forms
+  description: The Tax Form API provides operations for fetching tax document information for a given tax year.
+paths:
+  /v1/account/{accountId}/tax-forms:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      operationId: GetTaxForms
+      summary: Get tax forms
+      description: Get the full lists of tax document data available for a specific year for the current authorized Client. The tax document URLs are AWS presigned URLs that are <strong>valid for 5 minutes</strong>.
+      tags:
+      - Tax Forms
+      parameters:
+      - $ref: '#/components/parameters/TaxYearQuery'
+      - $ref: '#/components/parameters/AccountIdPath'
+      responses:
+        '200':
+          description: Array of metadata for all the tax document data available for the Client matching search criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaxDocumentResponse'
+              example:
+              - taxYear: 2021
+                documentId: '1'
+                documentUrl: https://d10cq78zmnjvsx.cloudfront.net/exaple-secured-tax-docs-path/1
+                documentTitle: Annual Tax Summary
+              - taxYear: 2022
+                documentId: '2'
+                documentUrl: https://d10cq78zmnjvsx.cloudfront.net/example-secured-tax-docs-path/2
+                documentTitle: Annual Tax Summary
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    TaxDocumentResponse:
+      title: Tax
+      description: Base entity for all IRS Tax forms
+      type: object
+      properties:
+        taxYear:
+          description: Year for which taxes are being paid
+          type: integer
+        documentId:
+          $ref: '#/components/schemas/Identifier'
+          description: Long-term persistent id for the tax form instance
+        documentUrl:
+          description: URL for accessing the document resource
+          type: string
+        documentTitle:
+          description: Title for the document
+          type: string
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    StringArray:
+      type: array
+      items:
+        type: string
+  responses:
+    '403':
+      description: Customer is not permitted to access the resource
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+  parameters:
+    TaxYearQuery:
+      name: taxYear
+      in: query
+      description: Tax year in which to search for tax forms.
+      required: false
+      schema:
+        type: integer
+    AccountIdPath:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
+  securitySchemes:
+    PartnerBasicAuthentication:
+      description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
+      type: http
+      scheme: basic
+    ClientBearerAuthentication:
+      description: 'ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token.  Since access tokens are scoped to specific Clients, they identify and authenticate the Client in a request.
+
+
+        Access tokens can be obtained in <a href="#tag/Authentication/operation/GetAccessToken">Get Access Token</a> requests by using the refresh token flow. OAuth refresh token are issued on <a href="#tag/Clients/operation/CreateClient">Client Creation</a> and scoped specifically to that Client. The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their devices.'
+      type: http
+      scheme: bearer

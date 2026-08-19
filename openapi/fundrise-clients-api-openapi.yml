@@ -1,0 +1,565 @@
+openapi: 3.2.0
+info:
+  title: Fundrise Connect (External API) Clients API
+  version: 1.0.0
+  contact:
+    name: Fundrise Connect Support Team
+    email: connect@fundrise.com
+  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  x-logo:
+    url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
+    backgroundColor: '#FFFFFF'
+    altText: Fundrise
+    href: .
+servers:
+- description: Sandbox
+  url: https://sandbox.fundrise.com
+tags:
+- name: Clients
+  description: 'The Clients API provides operations for creating new Clients and updating fields for existing Clients.
+
+    The Client represents an End-User of the platform. Newly created Clients will have exactly one account with a single `accountId`. This `accountId` is used in the Place Investment step of this flow. Currently multiple accounts are not supported in the system, but is on our long term roadmap to build.'
+paths:
+  /v1/client:
+    post:
+      security:
+      - PartnerBasicAuthentication: []
+      summary: Create Client
+      description: "Creates a Client within the Fundrise application. \nA refresh token will be returned with this request which is scoped to the newly-created Client.  It is important to retain this refresh token as it is required to obtain access tokens via the <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> operation.\nAccess tokens will be required for ClientBearerAuthentication which secures other endpoints.  Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely, used only in server-to-server communication, and not exposed to the End-User."
+      operationId: CreateClient
+      tags:
+      - Clients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCreationRequest'
+            examples:
+              clientCreationRequest:
+                value:
+                  firstName: John
+                  lastName: Smith
+                  primaryEmail: jsmith@fundrise.com
+                  taxId: '218110123'
+                  dateOfBirth: '1980-01-31'
+                  primaryAddress:
+                    address1: 11 Dupont Cir NW
+                    address2: Floor 10
+                    city: Washington
+                    state: DC
+                    zip: '20036'
+                    country: US
+                  partnerReferenceId: '1'
+      responses:
+        '201':
+          description: Client created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientCreationResponse'
+              examples:
+                client:
+                  value:
+                    clientId: '1'
+                    refreshToken: 2b1a7986-a277-41e4-b153-688f84b6edcb
+                    accounts:
+                    - accountId: '12'
+        '400':
+          description: Invalid operation type, Improperly formatted Client fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                clientExists:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    validationErrors:
+                      partnerReferenceId:
+                      - must not be blank
+                      - must not be null
+                      primaryEmail:
+                      - must be a well-formed email address
+                      - must not be blank
+                      - must not be null
+                      firstName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      lastName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      taxId:
+                      - must not be blank
+                      - must not be null
+                      - must be a string containing 9 digits
+                      primaryAddress:
+                      - must not be blank
+                      - must not be null
+                      primaryAddress.address1:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.address2:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.city:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.state:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 2
+                      - must be a U.S. state abbreviation
+                      primaryAddress.zip:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Zip must be five digits
+                      primaryAddress.country:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Country must be US
+                      dateOfBirth:
+                      - must not be blank
+                      - must not be null
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '409':
+          description: Conflict creating resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                unexpectedError:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200100'
+                    message: Client already created for supplied partnerReferenceId
+        '500':
+          $ref: '#/components/responses/500'
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Client
+      description: Returns the Client object for the currently authenticated Client.
+      operationId: GetClient
+      tags:
+      - Clients
+      responses:
+        '200':
+          description: Client found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+              examples:
+                client:
+                  value:
+                    clientId: '1'
+                    primaryEmail: jsmith@fundrise.com
+                    firstName: John
+                    lastName: Smith
+                    taxId: '218110123'
+                    primaryAddress:
+                      address1: 11 Dupont Cir NW
+                      address2: Floor 10
+                      city: Washington
+                      state: DC
+                      zip: '20036'
+                      country: US
+                    dateOfBirth: '1980-02-24'
+                    accounts:
+                    - accountId: '12'
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Update Client
+      description: Update a Client's name, email, and address.
+      operationId: UpdateClient
+      tags:
+      - Clients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientUpdateRequest'
+            examples:
+              nameOnly:
+                value:
+                  firstName: Judith
+                  lastName: Jones
+              emailOnly:
+                value:
+                  primaryEmail: zappa@fundrise.com
+              addressOnly:
+                value:
+                  primaryAddress:
+                    address1: 11 Dupont Cir NW
+                    address2: Floor 10
+                    city: Washington
+                    state: DC
+                    country: US
+                    zip: '20036'
+              nameAndEmail:
+                value:
+                  firstName: Judith
+                  lastName: Jones
+                  primaryEmail: zappa@fundrise.com
+              allUpdatableFields:
+                value:
+                  firstName: John
+                  lastName: Smith
+                  primaryEmail: jsmith@fundrise.com
+                  primaryAddress:
+                    address1: 11 Dupont Cir NW
+                    address2: Floor 10
+                    city: Washington
+                    state: DC
+                    zip: '20036'
+                    country: US
+      responses:
+        '200':
+          description: Client updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUpdateResponse'
+              examples:
+                client:
+                  value:
+                    clientId: '1'
+                    primaryEmail: jsmith@fundrise.com
+                    firstName: John
+                    lastName: Smith
+                    taxId: '218110123'
+                    primaryAddress:
+                      address1: 11 Dupont Cir NW
+                      address2: Floor 10
+                      city: Washington
+                      state: DC
+                      zip: '20036'
+                      country: US
+                    dateOfBirth: '1991-05-25'
+                    accounts:
+                    - accountId: '12'
+        '400':
+          description: Invalid operation type, Improperly formatted Client fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                validationErrors:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    validationErrors:
+                      primaryEmail:
+                      - must be a well-formed email address
+                      - must not be blank
+                      - must not be null
+                      firstName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      lastName:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 150
+                      primaryAddress:
+                      - must not be blank
+                      - must not be null
+                      primaryAddress.address1:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.address2:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.city:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 1 and 255
+                      primaryAddress.state:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 2 and 2
+                      - must be a U.S. state abbreviation
+                      primaryAddress.zip:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Zip must be five digits
+                      primaryAddress.country:
+                      - must not be blank
+                      - must not be null
+                      - size must be between 5 and 5
+                      - Country must be US
+        '401':
+          description: Invalid or expired token
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    AddressResponse:
+      $ref: '#/components/schemas/Address'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    Date:
+      title: Date String
+      description: ISO 8601 full-date in format 'YYYY-MM-DD' according to [IETF RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14)
+      type: string
+      format: date
+      example: '2021-07-15'
+    ClientCreationResponse:
+      title: Client Creation Response
+      description: A Fundrise Client Creation Response Object.
+      type: object
+      properties:
+        refreshToken:
+          description: A non expiring OAuth Refresh Token to enable API access on behalf of the newly created Client.  This should be securely stored and treated as if it were a password.
+          maxLength: 256
+          type: string
+        clientId:
+          description: Unique public identifier of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        accounts:
+          description: An array of accounts belonging to the Client object. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    AddressRequest:
+      $ref: '#/components/schemas/Address'
+    ClientResponse:
+      description: A Fundrise Client Object.
+      properties:
+        clientId:
+          description: Long-term persistent public identity of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        primaryEmail:
+          description: The Client's primary email address.
+          maxLength: 256
+          type: string
+        firstName:
+          description: The Client's first name.
+          maxLength: 256
+          type: string
+        lastName:
+          description: The Client's last name.
+          maxLength: 256
+          type: string
+        taxId:
+          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
+          maxLength: 256
+          type: string
+        primaryAddress:
+          $ref: '#/components/schemas/AddressResponse'
+          description: Client's primary address.
+        dateOfBirth:
+          $ref: '#/components/schemas/Date'
+          description: The Client's date of birth.
+        accounts:
+          description: An array of accounts belonging to the Client. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    ClientCreationRequest:
+      title: Client Creation Request
+      description: A Fundrise Client Creation Request Object.
+      type: object
+      properties:
+        partnerReferenceId:
+          description: An idempotency key to ensure duplicate clients are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Client in their system. This should not contain PII.
+          type: string
+          x-field-extra-annotation: '@NotBlank'
+        primaryEmail:
+          description: The Client's primary email address.
+          maxLength: 150
+          x-field-extra-annotation: '@NotBlank @Email'
+          type: string
+          format: email
+        firstName:
+          description: The Client's current first name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        lastName:
+          description: The Client's current last name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        taxId:
+          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
+          type: string
+          x-field-extra-annotation: '@NotBlank @Pattern(regexp = "([0-9]{9})", message = "must be a string containing 9 digits")'
+        primaryAddress:
+          $ref: '#/components/schemas/AddressRequest'
+          description: The Client's primary address.
+        dateOfBirth:
+          $ref: '#/components/schemas/Date'
+          description: The Client's date of birth.
+      required:
+      - partnerReferenceId
+      - primaryEmail
+      - firstName
+      - lastName
+      - taxId
+      - primaryAddress
+      - dateOfBirth
+    Address:
+      title: Address
+      description: An address object.
+      type: object
+      properties:
+        address1:
+          description: The street address.
+          minLength: 1
+          maxLength: 255
+          type: string
+        address2:
+          description: The second line of the street address.
+          maxLength: 255
+          type: string
+        city:
+          description: The City of the address.
+          minLength: 1
+          maxLength: 255
+          type: string
+        state:
+          description: The State abbreviation of the address.
+          minLength: 2
+          maxLength: 2
+          type: string
+          x-field-extra-annotation: '@Pattern(regexp = "(A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|PA|RI|S[CD]|T[NX]|UT|V[AT]|W[AIVY])", message = "must be a U.S. state abbreviation")'
+        zip:
+          description: The ZIP code of the address.
+          minLength: 5
+          maxLength: 5
+          type: string
+          x-field-extra-annotation: '@Pattern(regexp = "[0-9]{5}", message = "Zip must be five digits")'
+        country:
+          description: The country of the address
+          minLength: 2
+          maxLength: 2
+          type: string
+          x-field-extra-annotation: '@Pattern(regexp = "^US$", message = "Country must be US")'
+      required:
+      - address1
+      - city
+      - state
+      - zip
+      - country
+    ClientUpdateResponse:
+      description: An updated Fundrise Client object.
+      allOf:
+      - $ref: '#/components/schemas/ClientResponse'
+    StringArray:
+      type: array
+      items:
+        type: string
+    AccountIdResponse:
+      title: Account ID Response
+      description: A Fundrise Client Account object containing the ID of created Account.
+      type: object
+      properties:
+        accountId:
+          description: Long-term persistent public identity of the Account with Fundrise.
+          type: string
+          format: int64
+    ClientUpdateRequest:
+      description: A Fundrise Client Update Request Object.
+      properties:
+        primaryEmail:
+          description: The Client's email address.
+          maxLength: 150
+          type: string
+          format: email
+          x-field-extra-annotation: '@Email'
+        firstName:
+          description: The Client's current first name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        lastName:
+          description: The Client's current last name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        primaryAddress:
+          $ref: '#/components/schemas/AddressRequest'
+          description: Client's primary address.
+  responses:
+    '403':
+      description: Customer is not permitted to access the resource
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+  securitySchemes:
+    PartnerBasicAuthentication:
+      description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
+      type: http
+      scheme: basic
+    ClientBearerAuthentication:
+      description: 'ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token.  Since access tokens are scoped to specific Clients, they identify and authenticate the Client in a request.
+
+
+        Access tokens can be obtained in <a href="#tag/Authentication/operation/GetAccessToken">Get Access Token</a> requests by using the refresh token flow. OAuth refresh token are issued on <a href="#tag/Clients/operation/CreateClient">Client Creation</a> and scoped specifically to that Client. The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their devices.'
+      type: http
+      scheme: bearer

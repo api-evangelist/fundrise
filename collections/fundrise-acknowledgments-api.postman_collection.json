@@ -1,0 +1,622 @@
+{
+  "item": [
+    {
+      "id": "b1f111bb-bf95-435f-8ef8-9a2bdf22ff95",
+      "name": "Acknowledgments",
+      "description": {
+        "content": "The Acknowledgments API provides acknowledgments needed to place Investments and Liquidations.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "522d2040-f78e-4cf9-9f8f-0f4b3f2e421b",
+          "name": "Get Liquidation Acknowledgments",
+          "request": {
+            "name": "Get Liquidation Acknowledgments",
+            "description": {
+              "content": "The Liquidation acknowledgments API provides access to Fundrise Liquidation acknowledgments required to submit Liquidation requests.  The acknowledgments must be displayed to the user and the user must digitally sign the acknowledgments and submit the IDs when liquidating.  Digitally signing means the Partner platform must display associated checkboxes for each acknowledgement and require the user to check them to proceed.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "liquidation",
+                "acknowledgments"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "offeringIds",
+                  "value": "<int64>",
+                  "description": "(Required) "
+                },
+                {
+                  "disabled": false,
+                  "key": "offeringIds",
+                  "value": "<int64>",
+                  "description": "(Required) "
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "6c7465fe-6ecb-4a47-8e04-53d2c15bbda3",
+              "name": "A successful response.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "liquidation",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    },
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"acknowledgmentId\": \"1\",\n    \"acknowledgmentText\": \"I certify that I am authorized to make these elections and that all information provided is true and accurate. I certify that I have read and understand the documentation associated with my fund's offer to repurchase my shares and I agree to be bound by all terms and conditions included therein.\"\n  },\n  {\n    \"acknowledgmentId\": \"2\",\n    \"acknowledgmentText\": \"I agree that Fundrise Advisors, LLC is entitled to act on the instructions of this request, without further inquiry, and these instructions supersede and have priority over all previous instructions in respect to the shares requested for redemption or repurchase.\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a85954df-d2b1-40aa-a215-58b5191c4140",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "liquidation",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    },
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "f645d312-22ad-42bc-a5b0-941a2c6e7c90",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "liquidation",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    },
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200104\",\n  \"message\": \"Liquidation acknowledgments not found for provided offeringIds\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1bc46e47-6671-473d-a585-8732c4e80939",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "liquidation",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    },
+                    {
+                      "key": "offeringIds",
+                      "value": "<int64>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e5a3f869-b6fc-4fd9-9dda-c012f0cdac23",
+          "name": "Get Investment Acknowledgments",
+          "request": {
+            "name": "Get Investment Acknowledgments",
+            "description": {
+              "content": "This endpoint provides access to Fundrise Offering acknowledgments required to place Investments. When a user has selected what Offering they would like to invest in from the `GET /v1/offerings` endpoint, the acknowledgments must be displayed to the user and the user must  digitally sign the acknowledgments and submit the IDs when investing into the Offering. Digitally signing means the Partner platform must display associated checkboxes for each acknowledgement and require the user to check them to proceed.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "offering",
+                ":offeringId",
+                "acknowledgments"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<int64>",
+                  "key": "offeringId",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "5540c9e5-8f2a-4cf0-a419-4bb1f2ca2668",
+              "name": "A successful response.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"acknowledgmentId\": \"1\",\n    \"acknowledgmentText\": \"I have reviewed each Offering Circular and Prospectus, reviewed and agree to each Subscription Agreement, and understand the risks associated with this offering.\"\n  },\n  {\n    \"acknowledgmentId\": \"2\",\n    \"acknowledgmentText\": \"I recognize that my investment is in alternative assets which are fundamentally long-term, illiquid investments; that liquidations, if approved, are paid out quarterly for the eREITs and the funds registered under the Investment Company Act of 1940, and monthly after a minimum 60-day waiting period for the eFund; and, where possible, requests for liquidation may be suspended during periods of financial stress.\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b7b033a4-0cbb-4e41-b221-8c8f3c84aa50",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200103\",\n  \"message\": \"offeringIds are required\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "171fa4ba-ddcc-4c93-9e9b-061168003b37",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ae823a0d-177e-498b-8117-c1406929fcfc",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200103\",\n  \"message\": \"Acknowledgments not found for provided offeringIds\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "15c4d0c5-5f4c-44d9-b254-c73c51cb1041",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "offering",
+                    ":offeringId",
+                    "acknowledgments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<int64>",
+                      "key": "offeringId",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.fundrise.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "1388cdd1-7081-41e1-b3ab-3425b9ef2a3a",
+    "name": "Fundrise Connect (External API) Acknowledgments API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n\nContact Support:\n Name: Fundrise Connect Support Team\n Email: connect@fundrise.com",
+      "type": "text/plain"
+    }
+  }
+}

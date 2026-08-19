@@ -1,0 +1,88 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Offerings API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Offerings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Offerings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/offerings",
+            "params": [
+              {
+                "name": "assetClass",
+                "value": "",
+                "type": "query",
+                "description": "Enum indicating the underlying asset class that the Offering represents."
+              }
+            ],
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "Returns a list of Fundrise Offerings accessible via this API. This endpoint supports a query parameter to filter Offerings for a specific asset class.  Not passing the query parameter will return all available asset classes."
+        },
+        {
+          "info": {
+            "name": "Get Historical Daily NAV",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/offering/:offeringId/nav",
+            "params": [
+              {
+                "name": "offeringId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "Returns the historical daily net asset values for a Fundrise Offering accessible via this API. "
+        },
+        {
+          "info": {
+            "name": "Get Offering Documents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/offering/:offeringId/documents",
+            "params": [
+              {
+                "name": "offeringId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "The documents API provides access to Fundrise Offering documentation to place Investments. When a user has selected what Offering they would like to invest in from the `GET /v1/offerings` endpoint, the documents (typically a `SUBSCRIPTION_AGREEMENT` and `PROSPECTUS`  or `OFFERING_CIRCULAR`) need to be displayed to the user before investing into the Offering."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

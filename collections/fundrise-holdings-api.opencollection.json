@@ -1,0 +1,52 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Holdings API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Holdings",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Offering Holdings",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/account/:accountId/holdings",
+            "params": [
+              {
+                "name": "accountId",
+                "value": "",
+                "type": "path",
+                "description": "The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+              },
+              {
+                "name": "offeringId",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "liquidable",
+                "value": "",
+                "type": "query",
+                "description": "A filter for requesting only holdings which are eligible for Liquidation."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns a collection containing all of the Client's current holdings within Fundrise.  Filter on optional Offering ID to return holding on a specific Offering.\nThe `liquidable` fields indicates shareholdings that are available for liquidation. This is filterable by the `liquidable` query parameter."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

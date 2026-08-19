@@ -1,0 +1,237 @@
+openapi: 3.2.0
+info:
+  title: Fundrise Connect (External API) Holdings API
+  version: 1.0.0
+  contact:
+    name: Fundrise Connect Support Team
+    email: connect@fundrise.com
+  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  x-logo:
+    url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
+    backgroundColor: '#FFFFFF'
+    altText: Fundrise
+    href: .
+servers:
+- description: Sandbox
+  url: https://sandbox.fundrise.com
+tags:
+- name: Holdings
+  description: The Holdings API contains up-to-date information about the status and performance of a Client's holdings in Fundrise. This endpoint may be used to fetch holding information after a Client's initial Transaction has been  completed. The response from this endpoint will update daily with underlying changes in appreciation and accruing dividends.
+paths:
+  /v1/account/{accountId}/holdings:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      description: 'Returns a collection containing all of the Client''s current holdings within Fundrise.  Filter on optional Offering ID to return holding on a specific Offering.
+
+        The `liquidable` fields indicates shareholdings that are available for liquidation. This is filterable by the `liquidable` query parameter.'
+      tags:
+      - Holdings
+      operationId: GetHoldings
+      summary: Get Offering Holdings
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/OfferingIdQuery'
+      - $ref: '#/components/parameters/LiquidableQuery'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HoldingResponse'
+              examples:
+                multi-offering:
+                  value:
+                  - offeringId: '1'
+                    currentValue: '10100.00'
+                    pendingValue: '100.00'
+                    settledValue: '10000.00'
+                    unpaidDistributions: '100.00'
+                    shares: '150.9'
+                    costBasis: '10.01'
+                    liquidable: false
+                  - offeringId: '2'
+                    currentValue: '100.00'
+                    pendingValue: '0.00'
+                    settledValue: '100.00'
+                    unpaidDistributions: '0'
+                    shares: '10.74'
+                    costBasis: '11.49'
+                    liquidable: true
+                  - offeringId: '3'
+                    currentValue: '2010.78'
+                    pendingValue: '10.00'
+                    settledValue: '2000.78'
+                    unpaidDistributions: '24.32'
+                    shares: '13.677401'
+                    costBasis: '15.01'
+                    liquidable: true
+                single-offering:
+                  value:
+                  - offeringId: '4'
+                    currentValue: '10100.00'
+                    pendingValue: '100.00'
+                    settledValue: '10000.00'
+                    unpaidDistributions: '100.00'
+                    shares: '200.000001'
+                    costBasis: '10.01'
+                    liquidable: false
+                no-holdings:
+                  value: []
+                liquidable:
+                  value:
+                  - offeringId: '1'
+                    currentValue: '2000.78'
+                    pendingValue: '0'
+                    settledValue: '2000.78'
+                    unpaidDistributions: '24.32'
+                    shares: '13.677401'
+                    costBasis: '10.01'
+                    liquidable: true
+        '204':
+          description: No active holding in specified Offering for Client
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    HoldingResponse:
+      description: A summary of the Client's holdings in an offering.
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Offering ID.
+        shares:
+          allOf:
+          - $ref: '#/components/schemas/SharePrecision'
+          description: The number of shares that make up the Holding, net of Liquidations. The precision of the this number can be up to 6 decimal places.
+        costBasis:
+          description: The weighted average of the price paid to purchase the shares in this Holding. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        currentValue:
+          description: The current value of the Holding's shares and pending orders. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        pendingValue:
+          description: The value of the Holding's pending orders. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        settledValue:
+          description: The value of the Holding's shares. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+        liquidable:
+          description: A boolean indicating whether or not the current shares are available for liquidation.
+          type: boolean
+        unpaidDistributions:
+          description: The unpaid distributions net of fees for the current Holding. The precision of this number can be up to 2 decimal places.
+          type: string
+          format: double
+      required:
+      - offeringId
+      - shares
+      - costBasis
+      - currentValue
+      - pendingValue
+      - settledValue
+      - liquidable
+      - unpaidDistributions
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    StringArray:
+      type: array
+      items:
+        type: string
+  parameters:
+    LiquidableQuery:
+      name: liquidable
+      in: query
+      required: false
+      description: A filter for requesting only holdings which are eligible for Liquidation.
+      schema:
+        type: boolean
+    OfferingIdQuery:
+      name: offeringId
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
+    AccountIdPath:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
+  responses:
+    '403':
+      description: Customer is not permitted to access the resource
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+  securitySchemes:
+    PartnerBasicAuthentication:
+      description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
+      type: http
+      scheme: basic
+    ClientBearerAuthentication:
+      description: 'ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token.  Since access tokens are scoped to specific Clients, they identify and authenticate the Client in a request.
+
+
+        Access tokens can be obtained in <a href="#tag/Authentication/operation/GetAccessToken">Get Access Token</a> requests by using the refresh token flow. OAuth refresh token are issued on <a href="#tag/Clients/operation/CreateClient">Client Creation</a> and scoped specifically to that Client. The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their devices.'
+      type: http
+      scheme: bearer

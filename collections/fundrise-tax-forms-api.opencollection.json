@@ -1,0 +1,47 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Tax Forms API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Tax Forms",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get tax forms",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/account/:accountId/tax-forms",
+            "params": [
+              {
+                "name": "taxYear",
+                "value": "",
+                "type": "query",
+                "description": "Tax year in which to search for tax forms."
+              },
+              {
+                "name": "accountId",
+                "value": "",
+                "type": "path",
+                "description": "The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Get the full lists of tax document data available for a specific year for the current authorized Client. The tax document URLs are AWS presigned URLs that are <strong>valid for 5 minutes</strong>."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

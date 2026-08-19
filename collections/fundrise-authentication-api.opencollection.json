@@ -1,0 +1,38 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Authentication API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Authentication",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Access Token",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.fundrise.com/v1/oauth/token",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "basic",
+              "username": "{{username}}",
+              "password": "{{password}}"
+            }
+          },
+          "docs": "This endpoint is an OAuth 2.0 Token Endpoint that supports the refresh token flow to obtain active access tokens, which are needed to access secured endpoints with ClientBearerAuthentication. \n\nRefresh tokens are issued on <a href=\"#tag/Clients/operation/CreateClient\">Client Creation</a> and are scoped to that specific Client.  Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely. At a minimum, refresh tokens should be encry"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

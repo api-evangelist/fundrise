@@ -1,0 +1,841 @@
+{
+  "item": [
+    {
+      "id": "d26ff2a5-7b8f-4c00-9209-c1dfad4f9583",
+      "name": "Investments",
+      "description": {
+        "content": "The Investment APIs provide operations for placing and cancelling Investments in various Offerings on behalf of an authenticated Client.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7259e36f-cbac-45a3-b768-3d716b7354d2",
+          "name": "Place Investment",
+          "request": {
+            "name": "Place Investment",
+            "description": {
+              "content": "Place an Investment in an Offering on behalf of a Client. \n\nNAV (net asset value, reflected as `sharePrice` in this response) is typically updated daily for the interval funds (Flagship Real Estate Fund and the Income Real Estate Fund).  As such, the `sharePrice` for Investments in interval funds will not be returned upon Investment placement in such funds via this endpoint. \n\nWith this specification, we are assuming that accounts on the Partner platform, at the time of onboarding, have linked & funded a central payment source with the ability to fund Investments placed.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "account",
+                ":accountId",
+                "investment"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "accountId",
+                  "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partnerReferenceId\": \"<string>\",\n  \"amount\": \"<double>\",\n  \"offeringId\": \"<int64>\",\n  \"acknowledgedDocumentIds\": [\n    \"<int64>\",\n    \"<int64>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "79fc6dc7-2165-4760-9168-0e6760f211ba",
+              "name": "Investment created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partnerReferenceId\": \"2314\",\n  \"offeringId\": \"1\",\n  \"acknowledgedDocumentIds\": [\n    \"1\",\n    \"2\"\n  ],\n  \"amount\": \"24187.50\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transactionId\": \"11\",\n  \"transactionType\": \"INVESTMENT\",\n  \"description\": \"Investment into Fundrise Offering\",\n  \"amount\": \"10000.00\",\n  \"transactionDate\": \"2023-02-15T00:00:00.000-05:00\",\n  \"offerings\": [\n    {\n      \"offeringId\": \"24\",\n      \"offeringName\": \"Flagship Fund\",\n      \"sharePrice\": \"10.04\",\n      \"shares\": \"996.015936\"\n    }\n  ],\n  \"status\": \"PENDING\",\n  \"isCancellable\": true,\n  \"debitCreditMemo\": \"CREDIT\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bf30ebb8-d28f-4456-843a-12786c55e39e",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partnerReferenceId\": \"2314\",\n  \"offeringId\": \"1\",\n  \"acknowledgedDocumentIds\": [\n    \"1\",\n    \"2\"\n  ],\n  \"amount\": \"24187.50\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"validationErrors\": {\n    \"partnerReferenceId\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"offeringId\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ],\n    \"amount\": [\n      \"must not be blank\",\n      \"must not be null\",\n      \"must be greater than or equal to 10.00\",\n      \"must be less than or equal to 100000.00\"\n    ],\n    \"acknowledgedDocumentIds\": [\n      \"must not be blank\",\n      \"must not be null\"\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "bc9652c7-2cb9-4d12-af85-64644096813d",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partnerReferenceId\": \"2314\",\n  \"offeringId\": \"1\",\n  \"acknowledgedDocumentIds\": [\n    \"1\",\n    \"2\"\n  ],\n  \"amount\": \"24187.50\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "60d286e8-a382-4495-bf8a-5c4ad46b3322",
+              "name": "Forbidden",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partnerReferenceId\": \"2314\",\n  \"offeringId\": \"1\",\n  \"acknowledgedDocumentIds\": [\n    \"1\",\n    \"2\"\n  ],\n  \"amount\": \"24187.50\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c40\",\n  \"code\": \"100500\",\n  \"message\": \"Account is frozen\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c735be0e-b457-4a7e-8908-82ca21ad5083",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partnerReferenceId\": \"2314\",\n  \"offeringId\": \"1\",\n  \"acknowledgedDocumentIds\": [\n    \"1\",\n    \"2\"\n  ],\n  \"amount\": \"24187.50\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200101\",\n  \"message\": \"Invalid offeringId provided\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "501dc169-b19d-4e0f-bd62-24cf15b50e1f",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"partnerReferenceId\": \"2314\",\n  \"offeringId\": \"1\",\n  \"acknowledgedDocumentIds\": [\n    \"1\",\n    \"2\"\n  ],\n  \"amount\": \"24187.50\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "db6c9dc1-4a10-4375-953f-cb9fd1cb3c9a",
+          "name": "Cancel Investment",
+          "request": {
+            "name": "Cancel Investment",
+            "description": {
+              "content": "Cancel an Investment in an Offering on behalf of the currently authenticated Client. \n\nAn Investment may be cancelled up until 5:00pm on the day that the Investment was placed. If the Investment was placed after 5:00pm EST or on a non-business day, it may be cancelled prior to 5:00pm of the next business day.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "account",
+                ":accountId",
+                "investment",
+                ":transactionId",
+                "cancel"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "accountId",
+                  "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "transactionId",
+                  "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "a312c9ca-41a2-4bfe-b940-a0fc0e194b11",
+              "name": "Investment cancelled successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment",
+                    ":transactionId",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transactionId\": \"11\",\n  \"transactionType\": \"INVESTMENT\",\n  \"description\": \"Investment into Fundrise Offering\",\n  \"amount\": \"10000.00\",\n  \"transactionDate\": \"2023-02-15T00:00:00.000-05:00\",\n  \"offerings\": [\n    {\n      \"offeringId\": \"24\",\n      \"offeringName\": \"Flagship Fund\",\n      \"sharePrice\": \"10.04\",\n      \"shares\": \"996.015936\"\n    }\n  ],\n  \"status\": \"FAILED\",\n  \"isCancellable\": false,\n  \"debitCreditMemo\": \"CREDIT\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5333d5d4-b9ae-43f0-9898-0f9d39c80e19",
+              "name": "Bad Request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment",
+                    ":transactionId",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"100510\",\n  \"message\": \"Investment must have a PENDING status to cancel\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d42b054c-0c9e-4a76-aebc-be3f71917a2f",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment",
+                    ":transactionId",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "PUT",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1edf0b89-05b2-41fc-9519-7eebc4303688",
+              "name": "Not Found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment",
+                    ":transactionId",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ef-ad46-c7c52fff0c34\",\n  \"code\": \"100512\",\n  \"message\": \"Invalid investmentId provided\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "787c3880-1a67-47d6-a1d4-9848705fc89a",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "investment",
+                    ":transactionId",
+                    "cancel"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.fundrise.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "5c8bd92c-c012-4718-9c47-4482b8eac8ab",
+    "name": "Fundrise Connect (External API) Investments API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n\nContact Support:\n Name: Fundrise Connect Support Team\n Email: connect@fundrise.com",
+      "type": "text/plain"
+    }
+  }
+}

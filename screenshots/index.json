@@ -1,0 +1,11 @@
+[
+  {
+    "repo": "fundrise",
+    "captured_at": "2026-08-17T123444",
+    "source_url": "https://fundrise.com/connect-api",
+    "source_type": "DeveloperPortal",
+    "file": "fundrise-2026-08-17T123444.png",
+    "bytes": 230424,
+    "capture": "playwright-local"
+  }
+]

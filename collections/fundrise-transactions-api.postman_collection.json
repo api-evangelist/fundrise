@@ -1,0 +1,733 @@
+{
+  "item": [
+    {
+      "id": "ca7a913e-7fb2-4c0f-a993-7c329c32df24",
+      "name": "Transactions",
+      "description": {
+        "content": "The Transactions API provides operations for fetching Transactions (individual or bulk) on behalf of authenticated Clients.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6b3be7d9-75aa-4423-9b56-9b076d57f0ba",
+          "name": "Get Transaction",
+          "request": {
+            "name": "Get Transaction",
+            "description": {
+              "content": "Returns a Transaction by the by `transactionId`, on behalf of the currently authenticated Client.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "account",
+                ":accountId",
+                "transaction",
+                ":transactionType",
+                ":transactionId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "accountId",
+                  "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "transactionType",
+                  "description": "(Required) The type associated with the Transaction ID."
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "transactionId",
+                  "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "65455899-57fc-4e92-a579-c9e9ae0c0d05",
+              "name": "A successful response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transaction",
+                    ":transactionType",
+                    ":transactionId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transactionType",
+                      "description": "(Required) The type associated with the Transaction ID."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"transactionId\": \"11\",\n  \"transactionType\": \"INVESTMENT\",\n  \"description\": \"Investment into Fundrise Offering\",\n  \"amount\": \"10000.00\",\n  \"transactionDate\": \"2023-02-15T00:00:00.000-05:00\",\n  \"offerings\": [\n    {\n      \"offeringId\": \"24\",\n      \"offeringName\": \"Flagship Fund\",\n      \"sharePrice\": \"10.04\",\n      \"shares\": \"996.015936\"\n    }\n  ],\n  \"status\": \"PENDING\",\n  \"isCancellable\": true,\n  \"debitCreditMemo\": \"CREDIT\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d70e3113-f30e-4379-842a-65525761306c",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transaction",
+                    ":transactionType",
+                    ":transactionId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transactionType",
+                      "description": "(Required) The type associated with the Transaction ID."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "72b58107-5fb2-4430-af09-33ff70c6a9db",
+              "name": "Customer is not permitted to access the resource",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transaction",
+                    ":transactionType",
+                    ":transactionId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transactionType",
+                      "description": "(Required) The type associated with the Transaction ID."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1c134cb1-d862-4619-bdc9-7d2ec11acdbf",
+              "name": "Transaction not found or account does not own transaction",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transaction",
+                    ":transactionType",
+                    ":transactionId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transactionType",
+                      "description": "(Required) The type associated with the Transaction ID."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c34\",\n  \"code\": \"200105\",\n  \"message\": \"Transaction does not exist or account does not own transaction\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b748a9fc-239b-4f59-bee8-4199db615958",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transaction",
+                    ":transactionType",
+                    ":transactionId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "transactionType",
+                      "description": "(Required) The type associated with the Transaction ID."
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "transactionId",
+                      "description": "(Required) The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "8591bb54-31cb-42bf-b6a3-8840cf868a8c",
+          "name": "Get Transactions",
+          "request": {
+            "name": "Get Transactions",
+            "description": {
+              "content": "Returns all Transactions for the supplied accountId on behalf of the currently authenticated Client.  Transactions may be filtered on the optional `TransactionType` query parameter. ",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "account",
+                ":accountId",
+                "transactions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "transactionType",
+                  "value": "<string>",
+                  "description": "Enum indicating the underlying object type that the Transaction represents."
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "accountId",
+                  "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "3f0d2d1d-d804-49dc-9665-7c82d1881909",
+              "name": "A successful response",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transactions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "transactionType",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"transactionId\": \"11\",\n    \"transactionType\": \"INVESTMENT\",\n    \"description\": \"Investment into Fundrise Offering\",\n    \"amount\": \"10000.00\",\n    \"transactionDate\": \"2023-02-15T00:00:00.000-05:00\",\n    \"offerings\": [\n      {\n        \"offeringId\": \"24\",\n        \"offeringName\": \"Flagship Fund\",\n        \"sharePrice\": \"10.04\",\n        \"shares\": \"996.015936\"\n      }\n    ],\n    \"status\": \"PENDING\",\n    \"isCancellable\": true,\n    \"debitCreditMemo\": \"CREDIT\"\n  },\n  {\n    \"transactionId\": \"12\",\n    \"transactionType\": \"INVESTMENT\",\n    \"description\": \"Investment into Fundrise Offering\",\n    \"amount\": \"10000.00\",\n    \"transactionDate\": \"2023-02-15T00:00:00.000-05:00\",\n    \"offerings\": [\n      {\n        \"offeringId\": \"24\",\n        \"offeringName\": \"Flagship Fund\",\n        \"sharePrice\": \"10.04\",\n        \"shares\": \"996.015936\"\n      }\n    ],\n    \"status\": \"PENDING\",\n    \"isCancellable\": false,\n    \"debitCreditMemo\": \"CREDIT\"\n  },\n  {\n    \"transactionId\": \"13\",\n    \"transactionType\": \"LIQUIDATION\",\n    \"description\": \"Liquidation request of Fundrise Offering\",\n    \"transactionDate\": \"2023-02-20T00:00:00.000-05:00\",\n    \"offerings\": [\n      {\n        \"offeringId\": \"24\",\n        \"offeringName\": \"Flagship Fund\",\n        \"shares\": \"300.015936\"\n      }\n    ],\n    \"status\": \"PENDING\",\n    \"isCancellable\": true,\n    \"debitCreditMemo\": \"DEBIT\"\n  },\n  {\n    \"transactionId\": \"14\",\n    \"transactionType\": \"LIQUIDATION\",\n    \"description\": \"Liquidation request of Fundrise Offering\",\n    \"transactionDate\": \"2023-02-20T00:00:00.000-05:00\",\n    \"offerings\": [\n      {\n        \"offeringId\": \"24\",\n        \"offeringName\": \"Flagship Fund\",\n        \"shares\": \"300.015936\"\n      }\n    ],\n    \"status\": \"FAILED\",\n    \"isCancellable\": false,\n    \"debitCreditMemo\": \"DEBIT\"\n  },\n  {\n    \"transactionId\": \"15\",\n    \"transactionType\": \"LIQUIDATION\",\n    \"description\": \"Liquidation of Fundrise Offering\",\n    \"amount\": \"10000.15\",\n    \"transactionDate\": \"2023-02-20T00:00:00.000-05:00\",\n    \"offerings\": [\n      {\n        \"offeringId\": \"24\",\n        \"offeringName\": \"Flagship Fund\",\n        \"sharePrice\": \"10.00\",\n        \"shares\": \"300.015936\",\n        \"amount\": \"3000.15\"\n      },\n      {\n        \"offeringId\": \"25\",\n        \"offeringName\": \"Income Interval Fund\",\n        \"sharePrice\": \"10.00\",\n        \"shares\": \"700.000000\",\n        \"amount\": \"7000.00\"\n      }\n    ],\n    \"status\": \"COMPLETE\",\n    \"isCancellable\": false,\n    \"debitCreditMemo\": \"DEBIT\"\n  },\n  {\n    \"transactionId\": \"16\",\n    \"transactionType\": \"DIVIDEND\",\n    \"description\": \"Dividend from Fundrise Offering\",\n    \"amount\": \"200.85\",\n    \"transactionDate\": \"2023-04-02T00:00:00.000-05:00\",\n    \"offerings\": [\n      {\n        \"offeringId\": \"1\",\n        \"offeringName\": \"Flagship Fund\"\n      }\n    ],\n    \"status\": \"COMPLETE\",\n    \"isCancellable\": false,\n    \"debitCreditMemo\": \"DEBIT\"\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f541ee9d-8b3e-4500-8425-e630781dec3e",
+              "name": "Unauthorized request to server, Invalid access token or Partner credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transactions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "transactionType",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a94039cc-32e6-4c9b-aca1-f021e0110434",
+              "name": "Customer is not permitted to access the resource",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transactions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "transactionType",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "7295bdaa-2261-42a4-bd92-f76b56f2dfc2",
+              "name": "Internal Service Error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "account",
+                    ":accountId",
+                    "transactions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "transactionType",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<long>",
+                      "key": "accountId",
+                      "description": "(Required) The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"referenceId\": \"ed8583b9-6cd9-43ed-ad46-c7c52fff0c35\",\n  \"message\": \"Internal service error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.fundrise.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "b3abede1-1809-4a34-8df1-07298d744800",
+    "name": "Fundrise Connect (External API) Transactions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>.\n\nContact Support:\n Name: Fundrise Connect Support Team\n Email: connect@fundrise.com",
+      "type": "text/plain"
+    }
+  }
+}

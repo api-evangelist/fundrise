@@ -1,0 +1,74 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Investments API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Investments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Place Investment",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.fundrise.com/v1/account/:accountId/investment",
+            "params": [
+              {
+                "name": "accountId",
+                "value": "",
+                "type": "path",
+                "description": "The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Place an Investment in an Offering on behalf of a Client. \n\nNAV (net asset value, reflected as `sharePrice` in this response) is typically updated daily for the interval funds (Flagship Real Estate Fund and the Income Real Estate Fund).  As such, the `sharePrice` for Investments in interval funds will not be returned upon Investment placement in such funds via this endpoint. \n\nWith this specification, we are assuming that accounts on the Partner platform, at the time of onboarding, have linked &"
+        },
+        {
+          "info": {
+            "name": "Cancel Investment",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://sandbox.fundrise.com/v1/account/:accountId/investment/:transactionId/cancel",
+            "params": [
+              {
+                "name": "accountId",
+                "value": "",
+                "type": "path",
+                "description": "The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+              },
+              {
+                "name": "transactionId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Cancel an Investment in an Offering on behalf of the currently authenticated Client. \n\nAn Investment may be cancelled up until 5:00pm on the day that the Investment was placed. If the Investment was placed after 5:00pm EST or on a non-business day, it may be cancelled prior to 5:00pm of the next business day."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

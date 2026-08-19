@@ -1,0 +1,407 @@
+openapi: 3.2.0
+info:
+  title: Fundrise Connect (External API) Transactions API
+  version: 1.0.0
+  contact:
+    name: Fundrise Connect Support Team
+    email: connect@fundrise.com
+  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  x-logo:
+    url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
+    backgroundColor: '#FFFFFF'
+    altText: Fundrise
+    href: .
+servers:
+- description: Sandbox
+  url: https://sandbox.fundrise.com
+tags:
+- name: Transactions
+  description: The Transactions API provides operations for fetching Transactions (individual or bulk) on behalf of authenticated Clients.
+paths:
+  /v1/account/{accountId}/transaction/{transactionType}/{transactionId}:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Transaction
+      description: Returns a Transaction by the by `transactionId`, on behalf of the currently authenticated Client.
+      operationId: GetTransaction
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/TransactionTypePath'
+      - $ref: '#/components/parameters/TransactionIdPath'
+      tags:
+      - Transactions
+      responses:
+        '200':
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                PendingInvestment:
+                  value:
+                    transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: CREDIT
+                SettlingInvestment:
+                  value:
+                    transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: COMPLETE
+                    isCancellable: false
+                    debitCreditMemo: CREDIT
+                PendingShareLiquidationRequest:
+                  value:
+                    transactionId: '13'
+                    transactionType: LIQUIDATION
+                    description: Liquidation request of Fundrise Offering
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '300.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: DEBIT
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          description: Transaction not found or account does not own transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundriseConnectError'
+              examples:
+                TransactionNotFound:
+                  value:
+                    referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c34
+                    code: '200105'
+                    message: Transaction does not exist or account does not own transaction
+        '500':
+          $ref: '#/components/responses/500'
+  /v1/account/{accountId}/transactions:
+    get:
+      security:
+      - ClientBearerAuthentication: []
+      summary: Get Transactions
+      description: 'Returns all Transactions for the supplied accountId on behalf of the currently authenticated Client.  Transactions may be filtered on the optional `TransactionType` query parameter. '
+      operationId: GetTransactions
+      parameters:
+      - $ref: '#/components/parameters/AccountIdPath'
+      - $ref: '#/components/parameters/TransactionTypeQuery'
+      tags:
+      - Transactions
+      responses:
+        '200':
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+              examples:
+                TransactionsResponse:
+                  value:
+                  - transactionId: '11'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: CREDIT
+                  - transactionId: '12'
+                    transactionType: INVESTMENT
+                    description: Investment into Fundrise Offering
+                    amount: '10000.00'
+                    transactionDate: '2023-02-15T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.04'
+                      shares: '996.015936'
+                    status: PENDING
+                    isCancellable: false
+                    debitCreditMemo: CREDIT
+                  - transactionId: '13'
+                    transactionType: LIQUIDATION
+                    description: Liquidation request of Fundrise Offering
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '300.015936'
+                    status: PENDING
+                    isCancellable: true
+                    debitCreditMemo: DEBIT
+                  - transactionId: '14'
+                    transactionType: LIQUIDATION
+                    description: Liquidation request of Fundrise Offering
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      shares: '300.015936'
+                    status: FAILED
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+                  - transactionId: '15'
+                    transactionType: LIQUIDATION
+                    description: Liquidation of Fundrise Offering
+                    amount: '10000.15'
+                    transactionDate: '2023-02-20T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '24'
+                      offeringName: Flagship Fund
+                      sharePrice: '10.00'
+                      shares: '300.015936'
+                      amount: '3000.15'
+                    - offeringId: '25'
+                      offeringName: Income Interval Fund
+                      sharePrice: '10.00'
+                      shares: '700.000000'
+                      amount: '7000.00'
+                    status: COMPLETE
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+                  - transactionId: '16'
+                    transactionType: DIVIDEND
+                    description: Dividend from Fundrise Offering
+                    amount: '200.85'
+                    transactionDate: '2023-04-02T00:00:00.000-05:00'
+                    offerings:
+                    - offeringId: '1'
+                      offeringName: Flagship Fund
+                    status: COMPLETE
+                    isCancellable: false
+                    debitCreditMemo: DEBIT
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    TransactionResponse:
+      title: TransactionResponse
+      description: An abstract response representing the core Transaction properties.
+      type: object
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/Identifier'
+          description: The ID of the Transaction
+        amount:
+          description: Total amount in USD.
+          type: string
+          format: double
+        transactionType:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        transactionDate:
+          description: The Transaction date.
+          type: string
+          format: date-time
+        description:
+          description: The Transaction description
+          maxLength: 2000
+          type: string
+        status:
+          $ref: '#/components/schemas/TransactionStatusEnum'
+        debitCreditMemo:
+          $ref: '#/components/schemas/DebitCreditTypeEnum'
+        fees:
+          description: The fees associated with the Transaction
+          type: string
+          format: double
+        offerings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionOfferingResponse'
+        isCancellable:
+          description: Boolean indicating whether or not the Transaction is cancellable.
+          type: boolean
+      required:
+      - transactionId
+      - transactionType
+      - transactionDate
+      - description
+      - status
+      - debitCreditMemo
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    TransactionOfferingResponse:
+      title: Transaction Offering Response
+      description: An Offering included in a Transaction
+      type: object
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Offering ID
+        offeringName:
+          description: The Offering name.
+          maxLength: 2000
+          type: string
+        shares:
+          $ref: '#/components/schemas/SharePrecision'
+          description: The number of shares in the Transaction
+        sharePrice:
+          description: The value in USD per share at the time of processing.
+          type: string
+          format: double
+        amount:
+          description: 'The total amount in USD to be returned to the Client, net of fees.  For example, the `amount` to be returned is described by the following formula:
+
+
+            `amount = (shares * sharePrice) - fees`.'
+          type: string
+          format: double
+      required:
+      - offeringId
+      - offeringName
+    TransactionTypeEnum:
+      title: Transaction Type
+      description: Enum representing the type of financial Transaction.
+      enum:
+      - INVESTMENT
+      - LIQUIDATION
+      - DIVIDEND
+    StringArray:
+      type: array
+      items:
+        type: string
+    TransactionStatusEnum:
+      title: Transaction Status
+      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
+      type: string
+      enum:
+      - PENDING
+      - COMPLETE
+      - FAILED
+    DebitCreditTypeEnum:
+      title: Debit/Credit type
+      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
+      type: string
+      enum:
+      - DEBIT
+      - CREDIT
+  parameters:
+    TransactionTypePath:
+      in: path
+      name: transactionType
+      required: true
+      schema:
+        $ref: '#/components/schemas/TransactionTypeEnum'
+      description: The type associated with the Transaction ID.
+    TransactionTypeQuery:
+      name: transactionType
+      in: query
+      description: Enum indicating the underlying object type that the Transaction represents.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TransactionTypeEnum'
+    TransactionIdPath:
+      in: path
+      name: transactionId
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction.
+    AccountIdPath:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
+  responses:
+    '403':
+      description: Customer is not permitted to access the resource
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+  securitySchemes:
+    PartnerBasicAuthentication:
+      description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
+      type: http
+      scheme: basic
+    ClientBearerAuthentication:
+      description: 'ClientBearerAuthentication is enforced by HTTP Bearer Authentication and requires an OAuth access token.  Since access tokens are scoped to specific Clients, they identify and authenticate the Client in a request.
+
+
+        Access tokens can be obtained in <a href="#tag/Authentication/operation/GetAccessToken">Get Access Token</a> requests by using the refresh token flow. OAuth refresh token are issued on <a href="#tag/Clients/operation/CreateClient">Client Creation</a> and scoped specifically to that Client. The refresh tokens will not expire and should be stored securely after Client creation. At a minimum, refresh tokens should be encrypted at-rest and access restricted to services making requests to the Fundrise API. Refresh tokens should not be exposed to a Client or any of their devices.'
+      type: http
+      scheme: bearer

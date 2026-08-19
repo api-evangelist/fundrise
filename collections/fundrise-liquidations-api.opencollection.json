@@ -1,0 +1,73 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Liquidations API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Liquidations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create Liquidation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.fundrise.com/v1/account/:accountId/liquidation",
+            "params": [
+              {
+                "name": "accountId",
+                "value": "",
+                "type": "path",
+                "description": "The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Creates a request to liquidate shares. \n\nIn order to place a Liquidation request, the holdings in question must be liquidable.  The liquidability of Holdings in any given Offering is determined by the `shares` field on the response from the <a href=\"#tag/Holdings/operation/GetHoldings\">Get Offering Holdings</a> endpoint. A non zero quantity of `shares` indicates that the Client holds non reduced shares in the given Offering (indicated by the `offeringId`) that can be liquidated.\n<strong>Liquidat"
+        },
+        {
+          "info": {
+            "name": "Cancel Liquidation",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://sandbox.fundrise.com/v1/account/:accountId/liquidation/:shareLiquidationRequestId/cancel",
+            "params": [
+              {
+                "name": "accountId",
+                "value": "",
+                "type": "path",
+                "description": "The account ID (returned by the <a href=\"#tag/Clients/operation/CreateClient\">Create Client operation</a> or the <a href=\"#tag/Clients/operation/GetClient\">Get Client operation</a>) associated with the request."
+              },
+              {
+                "name": "shareLiquidationRequestId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Cancels a request to liquidate shares.\n\nIn order to cancel a Liquidation Transaction, `isCancellable` (boolean field), must have a value of `true`.  Liquidations will typically remain cancellable up until the start of the processing period for the respective quarter in which it was placed."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

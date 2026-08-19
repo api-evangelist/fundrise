@@ -1,0 +1,62 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Fundrise Connect (External API) Acknowledgments API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Acknowledgments",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Liquidation Acknowledgments",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/liquidation/acknowledgments",
+            "params": [
+              {
+                "name": "offeringIds",
+                "value": "",
+                "type": "query"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "The Liquidation acknowledgments API provides access to Fundrise Liquidation acknowledgments required to submit Liquidation requests.  The acknowledgments must be displayed to the user and the user must digitally sign the acknowledgments and submit the IDs when liquidating.  Digitally signing means the Partner platform must display associated checkboxes for each acknowledgement and require the user to check them to proceed."
+        },
+        {
+          "info": {
+            "name": "Get Investment Acknowledgments",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.fundrise.com/v1/offering/:offeringId/acknowledgments",
+            "params": [
+              {
+                "name": "offeringId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "This endpoint provides access to Fundrise Offering acknowledgments required to place Investments. When a user has selected what Offering they would like to invest in from the `GET /v1/offerings` endpoint, the acknowledgments must be displayed to the user and the user must  digitally sign the acknowledgments and submit the IDs when investing into the Offering. Digitally signing means the Partner platform must display associated checkboxes for each acknowledgement and require the user to check the"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
