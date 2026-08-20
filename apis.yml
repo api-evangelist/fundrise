@@ -22,6 +22,17 @@ created: '2026-08-04'
 modified: '2026-08-04'
 tags:
 - Company
+- Financial-Services
+- Investing
+- Real-Estate
+- Private Credit
+- Venture Capital
+- Alternative Assets
+- Wealth Management
+- Fintech
+- Embedded Investing
+tags_raw:
+- Company
 - Financial Services
 - Investing
 - Real Estate
@@ -442,6 +453,8 @@ apis:
   humanURL: https://fundrise.com/connect-api
   baseURL: https://sandbox.fundrise.com
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
