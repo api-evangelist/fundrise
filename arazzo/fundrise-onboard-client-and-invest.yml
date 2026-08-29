@@ -22,10 +22,21 @@ x-guardrail: >-
   acknowledgedDocumentIds must reflect a genuine human acceptance, not an automatic one.
 
 sourceDescriptions:
-- name: fundriseConnect
-  url: ../openapi/fundrise-connect-openapi.yml
+- name: acknowledgmentsApi
+  url: ../openapi/fundrise-acknowledgments-api-openapi.yml
   type: openapi
-
+- name: authenticationApi
+  url: ../openapi/fundrise-authentication-api-openapi.yml
+  type: openapi
+- name: clientsApi
+  url: ../openapi/fundrise-clients-api-openapi.yml
+  type: openapi
+- name: investmentsApi
+  url: ../openapi/fundrise-investments-api-openapi.yml
+  type: openapi
+- name: offeringsApi
+  url: ../openapi/fundrise-offerings-api-openapi.yml
+  type: openapi
 workflows:
 - workflowId: onboard-client-and-place-investment
   summary: Onboard an end user as a Fundrise Client and place their first investment.
@@ -94,7 +105,7 @@ workflows:
       Onboard the end user. Partner HTTP Basic auth. A 409 means this partnerReferenceId
       already maps to an existing Client — treat that as a successful no-op and resolve the
       existing Client rather than retrying with a new key.
-    operationId: $sourceDescriptions.fundriseConnect.CreateClient
+    operationId: $sourceDescriptions.clientsApi.CreateClient
     requestBody:
       contentType: application/json
       payload:
@@ -123,7 +134,7 @@ workflows:
       Exchange the refresh token issued at Client creation for a Client-scoped access
       token. The refresh token does not expire and must be stored encrypted at rest —
       never expose it to the Client or a Client device.
-    operationId: $sourceDescriptions.fundriseConnect.GetAccessToken
+    operationId: $sourceDescriptions.authenticationApi.GetAccessToken
     requestBody:
       contentType: application/json
       payload:
@@ -138,7 +149,7 @@ workflows:
     description: >-
       List offerings available through Connect. Select one whose status is OPEN — CLOSED
       offerings cannot be invested in. Partner HTTP Basic auth.
-    operationId: $sourceDescriptions.fundriseConnect.GetOfferings
+    operationId: $sourceDescriptions.offeringsApi.GetOfferings
     successCriteria:
     - condition: $statusCode == 200
     outputs:
@@ -153,7 +164,7 @@ workflows:
       Fetch the documents and disclosures for the selected offering. These must be
       presented to the Client. Collect every documentId — they are required as
       acknowledgedDocumentIds on the investment request.
-    operationId: $sourceDescriptions.fundriseConnect.GetOfferingDocuments
+    operationId: $sourceDescriptions.offeringsApi.GetOfferingDocuments
     parameters:
     - name: offeringId
       in: path
@@ -171,7 +182,7 @@ workflows:
       bearer auth. Fundrise requires the Partner platform to display a checkbox per
       acknowledgment and require the user to check it to proceed — an automated pass
       through this step defeats a securities-law control.
-    operationId: $sourceDescriptions.fundriseConnect.GetInvestmentAcknowledgments
+    operationId: $sourceDescriptions.acknowledgmentsApi.GetInvestmentAcknowledgments
     parameters:
     - name: offeringId
       in: path
@@ -188,7 +199,7 @@ workflows:
       documentIds the Client actually accepted in the preceding two steps. On a 500,
       retrying with the same partnerReferenceId is safe because it is the idempotency key
       for this investment.
-    operationId: $sourceDescriptions.fundriseConnect.PlaceInvestment
+    operationId: $sourceDescriptions.investmentsApi.PlaceInvestment
     parameters:
     - name: accountId
       in: path
