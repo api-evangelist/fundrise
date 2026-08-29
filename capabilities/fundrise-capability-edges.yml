@@ -1,0 +1,28 @@
+slug: fundrise
+provider: Fundrise
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Banking & Capital Markets
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: Clients
+  spec_file: fundrise-clients-api-openapi.yml
+  capability_id: BC-1300.10
+  capability_id_l1: BC-1300
+  capability_name: Customer Onboarding Management
+  confidence: 0.75
+  evidence: 'POST /v1/client  CreateClient  Create Client; schemas ClientCreationRequest, AccountIdResponse,
+    AddressRequest; description: "external API for providing Client onboarding and investment into our
+    alternative assets"'
+  reason: Operations create, read and update the end-investor (Client) record and return an account id,
+    which is the onboarding/account-opening surface for a Partner bringing customers onto Fundrise. That
+    matches Customer Onboarding Management. Some ambiguity with Customer Information Management since
+    Update/Get are also maintenance of client data, hence 0.75.

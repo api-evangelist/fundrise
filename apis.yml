@@ -516,6 +516,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/fundrise-capability-edges.yml
+  name: Fundrise Business Capability Map
 - type: MCPServer
   url: mcp/fundrise-mcp.yml
 - type: Overlay
