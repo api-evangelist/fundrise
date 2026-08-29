@@ -13,6 +13,17 @@ info:
     published spec declares. Fundrise publishes no sandbox test values, so offeringId must
     be discovered at runtime from GetOfferings rather than seeded from a fixture.
 
+  x-realizes-capability-ids:
+  - BC-1300.10
+  x-capability-derivation:
+    method: 'deterministic join: sourceDescriptions -> per-tag OpenAPI -> tag/capability edge. No classification at this step.'
+    min_confidence: 0.7
+    sources:
+    - capability_id: BC-1300.10
+      capability_name: Customer Onboarding Management
+      spec: fundrise-clients-api-openapi.yml
+      confidence: 0.75
+    model: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities, CC BY 4.0
 x-generated: '2026-08-04'
 x-method: derived
 x-source: https://connect.fundrise.com/
