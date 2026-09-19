@@ -293,6 +293,8 @@ apis:
   humanURL: https://fundrise.com/connect-api
   baseURL: https://sandbox.fundrise.com
   tags:
+  - Investment
+  tags_raw:
   - Investments
   properties:
   - type: OpenAPI
