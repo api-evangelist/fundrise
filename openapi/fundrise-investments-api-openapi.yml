@@ -5,7 +5,9 @@ info:
   contact:
     name: Fundrise Connect Support Team
     email: connect@fundrise.com
-  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  description: '### Introduction
+
+    Fundrise is a Fintech company democratizing access to alternative assets through technology.'
   x-logo:
     url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
     backgroundColor: '#FFFFFF'
@@ -23,7 +25,13 @@ paths:
       security:
       - ClientBearerAuthentication: []
       summary: Place Investment
-      description: "Place an Investment in an Offering on behalf of a Client. \n\nNAV (net asset value, reflected as `sharePrice` in this response) is typically updated daily for the interval funds (Flagship Real Estate Fund and the Income Real Estate Fund).  As such, the `sharePrice` for Investments in interval funds will not be returned upon Investment placement in such funds via this endpoint. \n\nWith this specification, we are assuming that accounts on the Partner platform, at the time of onboarding, have linked & funded a central payment source with the ability to fund Investments placed."
+      description: 'Place an Investment in an Offering on behalf of a Client.
+
+
+        NAV (net asset value, reflected as `sharePrice` in this response) is typically updated daily for the interval funds (Flagship Real Estate Fund and the Income Real Estate Fund). As such, the `sharePrice` for Investments in interval funds will not be returned upon Investment placement in such funds via this endpoint.
+
+
+        With this specification, we are assuming that accounts on the Partner platform, at the time of onboarding, have linked & funded a central payment source with the ability to fund Investments placed.'
       operationId: PlaceInvestment
       tags:
       - Investments
@@ -135,7 +143,10 @@ paths:
       security:
       - ClientBearerAuthentication: []
       summary: Cancel Investment
-      description: "Cancel an Investment in an Offering on behalf of the currently authenticated Client. \n\nAn Investment may be cancelled up until 5:00pm on the day that the Investment was placed. If the Investment was placed after 5:00pm EST or on a non-business day, it may be cancelled prior to 5:00pm of the next business day."
+      description: 'Cancel an Investment in an Offering on behalf of the currently authenticated Client.
+
+
+        An Investment may be cancelled up until 5:00pm on the day that the Investment was placed. If the Investment was placed after 5:00pm EST or on a non-business day, it may be cancelled prior to 5:00pm of the next business day.'
       operationId: CancelInvestment
       tags:
       - Investments
@@ -201,17 +212,13 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
+    DebitCreditTypeEnum:
+      title: Debit/Credit type
+      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
       type: string
-      format: int64
-    SharePrecision:
-      title: SharePrecision
-      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
-      type: string
-      format: double
-      example: '10.000001'
+      enum:
+      - DEBIT
+      - CREDIT
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -234,6 +241,19 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
+    TransactionTypeEnum:
+      title: Transaction Type
+      description: Enum representing the type of financial Transaction.
+      enum:
+      - INVESTMENT
+      - LIQUIDATION
+      - DIVIDEND
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
     TransactionResponse:
       title: TransactionResponse
       description: An abstract response representing the core Transaction properties.
@@ -278,10 +298,18 @@ components:
       - description
       - status
       - debitCreditMemo
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
+    StringArray:
+      type: array
+      items:
+        type: string
+    TransactionStatusEnum:
+      title: Transaction Status
+      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
+      type: string
+      enum:
+      - PENDING
+      - COMPLETE
+      - FAILED
     InvestmentPlacementRequest:
       title: Investment Placement
       type: object
@@ -309,6 +337,11 @@ components:
           description: A list of `InvestmentAcknowledgment` IDs representing signatures of said acknowledgments. Submission of these IDs indicates that the user has both signed and consents to the acknowledgment agreements.
           items:
             $ref: '#/components/schemas/Identifier'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
     TransactionOfferingResponse:
       title: Transaction Offering Response
       description: An Offering included in a Transaction
@@ -338,32 +371,24 @@ components:
       required:
       - offeringId
       - offeringName
-    TransactionTypeEnum:
-      title: Transaction Type
-      description: Enum representing the type of financial Transaction.
-      enum:
-      - INVESTMENT
-      - LIQUIDATION
-      - DIVIDEND
-    StringArray:
-      type: array
-      items:
-        type: string
-    TransactionStatusEnum:
-      title: Transaction Status
-      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
-      type: string
-      enum:
-      - PENDING
-      - COMPLETE
-      - FAILED
-    DebitCreditTypeEnum:
-      title: Debit/Credit type
-      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
-      type: string
-      enum:
-      - DEBIT
-      - CREDIT
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
   parameters:
     TransactionIdPath:
       in: path
@@ -381,20 +406,6 @@ components:
         type: integer
         format: int64
       description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
-  responses:
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

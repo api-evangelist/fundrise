@@ -5,7 +5,9 @@ info:
   contact:
     name: Fundrise Connect Support Team
     email: connect@fundrise.com
-  description: "### Introduction\nFundrise is a Fintech company democratizing access to alternative assets through technology. This API represents a prototype of Fundrise Connect, which is our external API for providing Client onboarding and investment into our alternative assets. To get started, contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a> or view our <a href='#tag/Authentication'>getting access documentation</a>. <br> <br> The API is organized around REST. Our API has predictable resource-oriented URLs, accepts form-encoded request bodies, returns JSON-encoded responses,  and uses standard HTTP response codes, authentication, and verbs. <br> <br> Throughout this document, the following terminology will be used:\n  - <strong>Client</strong>: This refers to an End-User or customer that a Partner onboards onto Fundrise for investing in Fundrise assets.\n  - <strong>Partner</strong>: This refers to a company working with Fundrise to provide their End-Users or customers access to Fundrise assets.\n\n### Errors\nFundrise uses conventional HTTP response codes to indicate the success or failure of an API request. In general:\n  - Codes in the 2xx range indicate success. \n  - Codes in the 4xx range indicate an error that failed given the information provided (e.g., a required parameter was omitted, a charge failed, etc.). \n  - Codes in the 5xx range indicate an error with Fundrise's servers (these are rare).\n\nSome 4xx errors that could be handled programmatically (e.g., an address is invalid) include an error code that briefly explains the error reported. These errors that can be handled programmatically have error codes in the error response.  Endpoints that have programmatically resolvable errors have those codes defined in their schema definitions.\n### Request IDs \nEach API request has an associated request identifier. You can find this value in the response headers, under `Request-Id`.  This error will also be present in the error response body under the field `referenceId`. If you need to contact us about a specific request, providing the request identifier will ensure the fastest possible resolution.\n### Idempotency \nFor some POST endpoints, we require a Partner idempotency key to ensure operations are not duplicated. For both Client creation and Investment placement, we require a `partnerReferenceId` to ensure that Investments and Clients are not duplicated in our system.\n### Versioning\nAPI endpoints are versioned with path versioning. Each endpoint contains a version path parameter e.g. (`/v1/...`). To release new functionality without impacting existing customers, we will version endpoints and increment version numbers accordingly.  <br> <br> When endpoints are staged to be deprecated, Partners will be given ample time to integrate with new versions according to our service agreement. Partners should expect to receive communications related to deprecation timelines. \n### Rate limiting\nWe enforce rate limiting on our public API to avoid DoS (denial of service) issues. This rate limiting is enforced per Client and per HTTP method. If you are running into  rate limiting issues, please contact the support team via <a href=\"mailto:connect@fundrise.com\" target=\"_blank\">connect@fundrise.com</a>."
+  description: '### Introduction
+
+    Fundrise is a Fintech company democratizing access to alternative assets through technology.'
   x-logo:
     url: https://d10cq78zmnjvsx.cloudfront.net/interface/logo-hz-color.svg
     backgroundColor: '#FFFFFF'
@@ -25,7 +27,11 @@ paths:
       security:
       - PartnerBasicAuthentication: []
       summary: Create Client
-      description: "Creates a Client within the Fundrise application. \nA refresh token will be returned with this request which is scoped to the newly-created Client.  It is important to retain this refresh token as it is required to obtain access tokens via the <a href=\"#tag/Authentication/operation/GetAccessToken\">Get Access Token</a> operation.\nAccess tokens will be required for ClientBearerAuthentication which secures other endpoints.  Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely, used only in server-to-server communication, and not exposed to the End-User."
+      description: 'Creates a Client within the Fundrise application.
+
+        A refresh token will be returned with this request which is scoped to the newly-created Client. It is important to retain this refresh token as it is required to obtain access tokens via the Get Access Token operation.
+
+        Access tokens will be required for ClientBearerAuthentication which secures other endpoints. Refresh tokens will not expire and should only be used to obtain new access tokens. Refresh tokens should be stored securely, used only in server-to-server communication, and not exposed to the End-User.'
       operationId: CreateClient
       tags:
       - Clients
@@ -319,36 +325,6 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    AddressResponse:
-      $ref: '#/components/schemas/Address'
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
-    Date:
-      title: Date String
-      description: ISO 8601 full-date in format 'YYYY-MM-DD' according to [IETF RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14)
-      type: string
-      format: date
-      example: '2021-07-15'
-    ClientCreationResponse:
-      title: Client Creation Response
-      description: A Fundrise Client Creation Response Object.
-      type: object
-      properties:
-        refreshToken:
-          description: A non expiring OAuth Refresh Token to enable API access on behalf of the newly created Client.  This should be securely stored and treated as if it were a password.
-          maxLength: 256
-          type: string
-        clientId:
-          description: Unique public identifier of the Client with Fundrise.
-          $ref: '#/components/schemas/Identifier'
-        accounts:
-          description: An array of accounts belonging to the Client object. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountIdResponse'
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -371,10 +347,10 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
+    ClientUpdateResponse:
+      description: An updated Fundrise Client object.
+      allOf:
+      - $ref: '#/components/schemas/ClientResponse'
     AddressRequest:
       $ref: '#/components/schemas/Address'
     ClientResponse:
@@ -410,49 +386,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AccountIdResponse'
-    ClientCreationRequest:
-      title: Client Creation Request
-      description: A Fundrise Client Creation Request Object.
-      type: object
-      properties:
-        partnerReferenceId:
-          description: An idempotency key to ensure duplicate clients are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Client in their system. This should not contain PII.
-          type: string
-          x-field-extra-annotation: '@NotBlank'
-        primaryEmail:
-          description: The Client's primary email address.
-          maxLength: 150
-          x-field-extra-annotation: '@NotBlank @Email'
-          type: string
-          format: email
-        firstName:
-          description: The Client's current first name.
-          maxLength: 150
-          minLength: 2
-          type: string
-        lastName:
-          description: The Client's current last name.
-          maxLength: 150
-          minLength: 2
-          type: string
-        taxId:
-          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
-          type: string
-          x-field-extra-annotation: '@NotBlank @Pattern(regexp = "([0-9]{9})", message = "must be a string containing 9 digits")'
-        primaryAddress:
-          $ref: '#/components/schemas/AddressRequest'
-          description: The Client's primary address.
-        dateOfBirth:
-          $ref: '#/components/schemas/Date'
-          description: The Client's date of birth.
-      required:
-      - partnerReferenceId
-      - primaryEmail
-      - firstName
-      - lastName
-      - taxId
-      - primaryAddress
-      - dateOfBirth
+    StringArray:
+      type: array
+      items:
+        type: string
     Address:
       title: Address
       description: An address object.
@@ -496,14 +433,83 @@ components:
       - state
       - zip
       - country
-    ClientUpdateResponse:
-      description: An updated Fundrise Client object.
-      allOf:
-      - $ref: '#/components/schemas/ClientResponse'
-    StringArray:
-      type: array
-      items:
-        type: string
+    Date:
+      title: Date String
+      description: ISO 8601 full-date in format 'YYYY-MM-DD' according to [IETF RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14)
+      type: string
+      format: date
+      example: '2021-07-15'
+    ClientCreationRequest:
+      title: Client Creation Request
+      description: A Fundrise Client Creation Request Object.
+      type: object
+      properties:
+        partnerReferenceId:
+          description: An idempotency key to ensure duplicate clients are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Client in their system. This should not contain PII.
+          type: string
+          x-field-extra-annotation: '@NotBlank'
+        primaryEmail:
+          description: The Client's primary email address.
+          maxLength: 150
+          x-field-extra-annotation: '@NotBlank @Email'
+          type: string
+          format: email
+        firstName:
+          description: The Client's current first name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        lastName:
+          description: The Client's current last name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        taxId:
+          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
+          type: string
+          x-field-extra-annotation: '@NotBlank @Pattern(regexp = "([0-9]{9})", message = "must be a string containing 9 digits")'
+        primaryAddress:
+          $ref: '#/components/schemas/AddressRequest'
+          description: The Client's primary address.
+        dateOfBirth:
+          $ref: '#/components/schemas/Date'
+          description: The Client's date of birth.
+      required:
+      - partnerReferenceId
+      - primaryEmail
+      - firstName
+      - lastName
+      - taxId
+      - primaryAddress
+      - dateOfBirth
+    ClientCreationResponse:
+      title: Client Creation Response
+      description: A Fundrise Client Creation Response Object.
+      type: object
+      properties:
+        refreshToken:
+          description: A non expiring OAuth Refresh Token to enable API access on behalf of the newly created Client.  This should be securely stored and treated as if it were a password.
+          maxLength: 256
+          type: string
+        clientId:
+          description: Unique public identifier of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        accounts:
+          description: An array of accounts belonging to the Client object. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    AddressResponse:
+      $ref: '#/components/schemas/Address'
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
     AccountIdResponse:
       title: Account ID Response
       description: A Fundrise Client Account object containing the ID of created Account.
@@ -536,6 +542,8 @@ components:
           $ref: '#/components/schemas/AddressRequest'
           description: Client's primary address.
   responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
     '403':
       description: Customer is not permitted to access the resource
     '500':
@@ -549,8 +557,6 @@ components:
               value:
                 referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
                 message: Internal service error
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

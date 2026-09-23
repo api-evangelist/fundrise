@@ -1,15 +1,7 @@
 {
   "provider": "fundrise",
   "sources": [
-    "fundrise-acknowledgments-api-openapi.yml",
-    "fundrise-authentication-api-openapi.yml",
-    "fundrise-clients-api-openapi.yml",
-    "fundrise-holdings-api-openapi.yml",
-    "fundrise-investments-api-openapi.yml",
-    "fundrise-liquidations-api-openapi.yml",
-    "fundrise-offerings-api-openapi.yml",
-    "fundrise-tax-forms-api-openapi.yml",
-    "fundrise-transactions-api-openapi.yml"
+    "_original/fundrise-connect-openapi.json"
   ],
   "outputs": [
     "fundrise-acknowledgments-api-openapi.yml",
@@ -26,16 +18,21 @@
   "errors": [],
   "warnings": [],
   "notes": [
-    "fundrise-acknowledgments-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-authentication-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-clients-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-holdings-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-investments-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-liquidations-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-offerings-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-tax-forms-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "fundrise-transactions-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "fundrise-connect-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/fundrise-connect-openapi.yml: archived document superseded by a larger archived document",
+    "fundrise-acknowledgments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-authentication-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-clients-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-holdings-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-investments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-liquidations-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-offerings-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-tax-forms-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "fundrise-transactions-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
