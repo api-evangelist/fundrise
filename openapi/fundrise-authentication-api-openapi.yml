@@ -95,7 +95,31 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '403':
+      description: Customer is not permitted to access the resource
   schemas:
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    StringArray:
+      type: array
+      items:
+        type: string
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -142,30 +166,6 @@ components:
           type: string
           format: int64
           example: '3598'
-    StringArray:
-      type: array
-      items:
-        type: string
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '403':
-      description: Customer is not permitted to access the resource
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

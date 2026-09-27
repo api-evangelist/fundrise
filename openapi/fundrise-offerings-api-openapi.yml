@@ -168,28 +168,6 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    FundriseConnectError:
-      title: Error object
-      description: Error from Fundrise Connect.
-      type: object
-      properties:
-        referenceId:
-          description: A unique reference ID generated for every request that is for error tracing.
-          maxLength: 1000
-          type: string
-        code:
-          description: A numeric code mapping to a specific validation error.
-          maxLength: 6
-          type: string
-        message:
-          description: A human readable description of the error.
-          maxLength: 1000
-          type: string
-        validationErrors:
-          description: A map of field names to an array of form validation error messages
-          $ref: '#/components/schemas/FieldErrorMap'
-      required:
-      - referenceId
     OfferingStatusEnum:
       title: Offering Status
       description: The current status of the offering. `OPEN` indicates the Offering can be invested in while `CLOSED` indicates the Offering is unavailable.
@@ -197,88 +175,6 @@ components:
       enum:
       - OPEN
       - CLOSED
-    OfferingNavResponse:
-      title: Offering NAV Response
-      description: A historical daily NAV entry
-      properties:
-        effectiveDate:
-          description: The date the NAV was effective.
-          type: string
-          format: date-time
-        netAssetValuePerShare:
-          description: The share value.
-          type: string
-          format: double
-    AssetClass:
-      title: Asset Class
-      description: The asset class of the offering.
-      type: object
-      properties:
-        assetClassType:
-          $ref: '#/components/schemas/AssetClassEnum'
-        assetClassLabel:
-          type: string
-          description: Human readable label for the asset class
-    AssetClassEnum:
-      title: Asset Class type
-      description: The asset class of the offering.
-      maxLength: 256
-      enum:
-      - REAL_ESTATE
-      - PRIVATE_CREDIT
-      - VENTURE
-    PriceResponse:
-      title: Price Response
-      description: A Fundrise Offering Price.
-      type: object
-      properties:
-        price:
-          description: The Offering Price.
-          type: string
-          format: double
-        priceDate:
-          description: The effective date-time of the price.
-          type: string
-          format: date-time
-    StringArray:
-      type: array
-      items:
-        type: string
-    DocumentResponse:
-      title: Document
-      description: A Fundrise Document.
-      type: object
-      properties:
-        documentId:
-          description: The unique Document ID.
-          type: string
-          format: int64
-        documentName:
-          maxLength: 2000
-          type: string
-        documentType:
-          $ref: '#/components/schemas/DocumentTypeEnum'
-        documentUrl:
-          maxLength: 2000
-          type: string
-    DocumentTypeEnum:
-      title: Document Type
-      description: Enum representing the document type.
-      maxLength: 256
-      enum:
-      - AGREEMENT
-      - ACKNOWLEDGMENT
-      - DISCLOSURE
-      - PROSPECTUS
-      - OFFERING_CIRCULAR
-      - OTHER
-      - STATEMENT
-      - TAX_FORM
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
     OfferingResponse:
       title: Offering Response
       description: A Fundrise Offering.
@@ -324,6 +220,29 @@ components:
       - maximumInvestmentAmount
       - primaryObjective
       - currentDistributionRate
+    AssetClass:
+      title: Asset Class
+      description: The asset class of the offering.
+      type: object
+      properties:
+        assetClassType:
+          $ref: '#/components/schemas/AssetClassEnum'
+        assetClassLabel:
+          type: string
+          description: Human readable label for the asset class
+    DocumentTypeEnum:
+      title: Document Type
+      description: Enum representing the document type.
+      maxLength: 256
+      enum:
+      - AGREEMENT
+      - ACKNOWLEDGMENT
+      - DISCLOSURE
+      - PROSPECTUS
+      - OFFERING_CIRCULAR
+      - OTHER
+      - STATEMENT
+      - TAX_FORM
     FieldErrorMap:
       type: object
       additionalProperties:
@@ -344,6 +263,87 @@ components:
       required:
       - offeringId
       - historicalDailyNav
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    OfferingNavResponse:
+      title: Offering NAV Response
+      description: A historical daily NAV entry
+      properties:
+        effectiveDate:
+          description: The date the NAV was effective.
+          type: string
+          format: date-time
+        netAssetValuePerShare:
+          description: The share value.
+          type: string
+          format: double
+    AssetClassEnum:
+      title: Asset Class type
+      description: The asset class of the offering.
+      maxLength: 256
+      enum:
+      - REAL_ESTATE
+      - PRIVATE_CREDIT
+      - VENTURE
+    StringArray:
+      type: array
+      items:
+        type: string
+    DocumentResponse:
+      title: Document
+      description: A Fundrise Document.
+      type: object
+      properties:
+        documentId:
+          description: The unique Document ID.
+          type: string
+          format: int64
+        documentName:
+          maxLength: 2000
+          type: string
+        documentType:
+          $ref: '#/components/schemas/DocumentTypeEnum'
+        documentUrl:
+          maxLength: 2000
+          type: string
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    PriceResponse:
+      title: Price Response
+      description: A Fundrise Offering Price.
+      type: object
+      properties:
+        price:
+          description: The Offering Price.
+          type: string
+          format: double
+        priceDate:
+          description: The effective date-time of the price.
+          type: string
+          format: date-time
   responses:
     '401':
       description: Unauthorized request to server, Invalid access token or Partner credentials
@@ -359,13 +359,6 @@ components:
                 referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
                 message: Internal service error
   parameters:
-    OfferingIdPath:
-      name: offeringId
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/Identifier'
-        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
     AssetClassQuery:
       name: assetClass
       in: query
@@ -373,6 +366,13 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/AssetClassEnum'
+    OfferingIdPath:
+      name: offeringId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

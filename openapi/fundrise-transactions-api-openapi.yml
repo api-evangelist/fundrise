@@ -211,7 +211,62 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '403':
+      description: Customer is not permitted to access the resource
   schemas:
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    TransactionOfferingResponse:
+      title: Transaction Offering Response
+      description: An Offering included in a Transaction
+      type: object
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Offering ID
+        offeringName:
+          description: The Offering name.
+          maxLength: 2000
+          type: string
+        shares:
+          $ref: '#/components/schemas/SharePrecision'
+          description: The number of shares in the Transaction
+        sharePrice:
+          description: The value in USD per share at the time of processing.
+          type: string
+          format: double
+        amount:
+          description: 'The total amount in USD to be returned to the Client, net of fees.  For example, the `amount` to be returned is described by the following formula:
+
+
+            `amount = (shares * sharePrice) - fees`.'
+          type: string
+          format: double
+      required:
+      - offeringId
+      - offeringName
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
     DebitCreditTypeEnum:
       title: Debit/Credit type
       description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
@@ -219,6 +274,23 @@ components:
       enum:
       - DEBIT
       - CREDIT
+    TransactionStatusEnum:
+      title: Transaction Status
+      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
+      type: string
+      enum:
+      - PENDING
+      - COMPLETE
+      - FAILED
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    StringArray:
+      type: array
+      items:
+        type: string
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -241,19 +313,6 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
-    TransactionTypeEnum:
-      title: Transaction Type
-      description: Enum representing the type of financial Transaction.
-      enum:
-      - INVESTMENT
-      - LIQUIDATION
-      - DIVIDEND
-    SharePrecision:
-      title: SharePrecision
-      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
-      type: string
-      format: double
-      example: '10.000001'
     TransactionResponse:
       title: TransactionResponse
       description: An abstract response representing the core Transaction properties.
@@ -298,81 +357,14 @@ components:
       - description
       - status
       - debitCreditMemo
-    StringArray:
-      type: array
-      items:
-        type: string
-    TransactionStatusEnum:
-      title: Transaction Status
-      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
-      type: string
+    TransactionTypeEnum:
+      title: Transaction Type
+      description: Enum representing the type of financial Transaction.
       enum:
-      - PENDING
-      - COMPLETE
-      - FAILED
-    TransactionOfferingResponse:
-      title: Transaction Offering Response
-      description: An Offering included in a Transaction
-      type: object
-      properties:
-        offeringId:
-          $ref: '#/components/schemas/Identifier'
-          description: The Offering ID
-        offeringName:
-          description: The Offering name.
-          maxLength: 2000
-          type: string
-        shares:
-          $ref: '#/components/schemas/SharePrecision'
-          description: The number of shares in the Transaction
-        sharePrice:
-          description: The value in USD per share at the time of processing.
-          type: string
-          format: double
-        amount:
-          description: 'The total amount in USD to be returned to the Client, net of fees.  For example, the `amount` to be returned is described by the following formula:
-
-
-            `amount = (shares * sharePrice) - fees`.'
-          type: string
-          format: double
-      required:
-      - offeringId
-      - offeringName
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '403':
-      description: Customer is not permitted to access the resource
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
+      - INVESTMENT
+      - LIQUIDATION
+      - DIVIDEND
   parameters:
-    TransactionIdPath:
-      in: path
-      name: transactionId
-      required: true
-      schema:
-        type: integer
-        format: int64
-      description: The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction.
     TransactionTypeQuery:
       name: transactionType
       in: query
@@ -395,6 +387,14 @@ components:
       schema:
         $ref: '#/components/schemas/TransactionTypeEnum'
       description: The type associated with the Transaction ID.
+    TransactionIdPath:
+      in: path
+      name: transactionId
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction.
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

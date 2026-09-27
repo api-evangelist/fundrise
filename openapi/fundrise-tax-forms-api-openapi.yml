@@ -75,6 +75,19 @@ components:
         documentTitle:
           description: Title for the document
           type: string
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    StringArray:
+      type: array
+      items:
+        type: string
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -97,24 +110,9 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
-    StringArray:
-      type: array
-      items:
-        type: string
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
   responses:
     '401':
       description: Unauthorized request to server, Invalid access token or Partner credentials
-    '403':
-      description: Customer is not permitted to access the resource
     '500':
       description: Internal Service Error
       content:
@@ -126,6 +124,8 @@ components:
               value:
                 referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
                 message: Internal service error
+    '403':
+      description: Customer is not permitted to access the resource
   parameters:
     AccountIdPath:
       name: accountId

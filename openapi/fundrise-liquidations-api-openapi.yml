@@ -201,120 +201,27 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '403':
+      description: Customer is not permitted to access the resource
   schemas:
-    DebitCreditTypeEnum:
-      title: Debit/Credit type
-      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
-      type: string
-      enum:
-      - DEBIT
-      - CREDIT
-    FundriseConnectError:
-      title: Error object
-      description: Error from Fundrise Connect.
+    FieldErrorMap:
       type: object
-      properties:
-        referenceId:
-          description: A unique reference ID generated for every request that is for error tracing.
-          maxLength: 1000
-          type: string
-        code:
-          description: A numeric code mapping to a specific validation error.
-          maxLength: 6
-          type: string
-        message:
-          description: A human readable description of the error.
-          maxLength: 1000
-          type: string
-        validationErrors:
-          description: A map of field names to an array of form validation error messages
-          $ref: '#/components/schemas/FieldErrorMap'
-      required:
-      - referenceId
-    ShareLiquidationOfferingRequest:
-      type: object
-      description: The fund information for the sale
-      properties:
-        offeringId:
-          $ref: '#/components/schemas/Identifier'
-          description: The Fundrise Offering ID
-        shares:
-          allOf:
-          - $ref: '#/components/schemas/SharePrecision'
-          description: The fractional quantity of shares to liquidate. The precision of the this number can be up to 6 decimal places. The total quantity of liquididable shares for a given Offering can be obtained from the <a href="#tag/Holdings/operation/GetHoldings">Get Offering Holdings</a> endpoint.
-          x-field-extra-annotation: '@Positive @Digits(integer = 999999, fraction = 6, message = "must be less than or equal to 6 decimal places")'
-      required:
-      - offeringId
-      - shares
-    TransactionTypeEnum:
-      title: Transaction Type
-      description: Enum representing the type of financial Transaction.
-      enum:
-      - INVESTMENT
-      - LIQUIDATION
-      - DIVIDEND
-    SharePrecision:
-      title: SharePrecision
-      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
-      type: string
-      format: double
-      example: '10.000001'
-    TransactionResponse:
-      title: TransactionResponse
-      description: An abstract response representing the core Transaction properties.
-      type: object
-      properties:
-        transactionId:
-          $ref: '#/components/schemas/Identifier'
-          description: The ID of the Transaction
-        amount:
-          description: Total amount in USD.
-          type: string
-          format: double
-        transactionType:
-          $ref: '#/components/schemas/TransactionTypeEnum'
-        transactionDate:
-          description: The Transaction date.
-          type: string
-          format: date-time
-        description:
-          description: The Transaction description
-          maxLength: 2000
-          type: string
-        status:
-          $ref: '#/components/schemas/TransactionStatusEnum'
-        debitCreditMemo:
-          $ref: '#/components/schemas/DebitCreditTypeEnum'
-        fees:
-          description: The fees associated with the Transaction
-          type: string
-          format: double
-        offerings:
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionOfferingResponse'
-        isCancellable:
-          description: Boolean indicating whether or not the Transaction is cancellable.
-          type: boolean
-      required:
-      - transactionId
-      - transactionType
-      - transactionDate
-      - description
-      - status
-      - debitCreditMemo
-    StringArray:
-      type: array
-      items:
-        type: string
-    TransactionStatusEnum:
-      title: Transaction Status
-      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
-      type: string
-      enum:
-      - PENDING
-      - COMPLETE
-      - FAILED
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
     ShareLiquidationRequest:
       type: object
       description: A request for a Fundrise share liquidation
@@ -367,23 +274,125 @@ components:
       required:
       - offeringId
       - offeringName
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
+    DebitCreditTypeEnum:
+      title: Debit/Credit type
+      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
+      type: string
+      enum:
+      - DEBIT
+      - CREDIT
+    TransactionStatusEnum:
+      title: Transaction Status
+      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
+      type: string
+      enum:
+      - PENDING
+      - COMPLETE
+      - FAILED
     Identifier:
       title: Identifier
       description: Value for a unique identifier.
       type: string
       format: int64
-    FieldErrorMap:
+    ShareLiquidationOfferingRequest:
       type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
+      description: The fund information for the sale
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Fundrise Offering ID
+        shares:
+          allOf:
+          - $ref: '#/components/schemas/SharePrecision'
+          description: The fractional quantity of shares to liquidate. The precision of the this number can be up to 6 decimal places. The total quantity of liquididable shares for a given Offering can be obtained from the <a href="#tag/Holdings/operation/GetHoldings">Get Offering Holdings</a> endpoint.
+          x-field-extra-annotation: '@Positive @Digits(integer = 999999, fraction = 6, message = "must be less than or equal to 6 decimal places")'
+      required:
+      - offeringId
+      - shares
+    StringArray:
+      type: array
+      items:
+        type: string
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    TransactionResponse:
+      title: TransactionResponse
+      description: An abstract response representing the core Transaction properties.
+      type: object
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/Identifier'
+          description: The ID of the Transaction
+        amount:
+          description: Total amount in USD.
+          type: string
+          format: double
+        transactionType:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        transactionDate:
+          description: The Transaction date.
+          type: string
+          format: date-time
+        description:
+          description: The Transaction description
+          maxLength: 2000
+          type: string
+        status:
+          $ref: '#/components/schemas/TransactionStatusEnum'
+        debitCreditMemo:
+          $ref: '#/components/schemas/DebitCreditTypeEnum'
+        fees:
+          description: The fees associated with the Transaction
+          type: string
+          format: double
+        offerings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionOfferingResponse'
+        isCancellable:
+          description: Boolean indicating whether or not the Transaction is cancellable.
+          type: boolean
+      required:
+      - transactionId
+      - transactionType
+      - transactionDate
+      - description
+      - status
+      - debitCreditMemo
+    TransactionTypeEnum:
+      title: Transaction Type
+      description: Enum representing the type of financial Transaction.
+      enum:
+      - INVESTMENT
+      - LIQUIDATION
+      - DIVIDEND
   parameters:
-    ShareLiquidationRequestIdPath:
-      name: shareLiquidationRequestId
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/Identifier'
-        description: The share liquidation request ID (returned by the <a href="#tag/Liquidation/operation/CreateShareLiquidationRequest">Create Liquidation operation</a>) associated with the request.
     AccountIdPath:
       name: accountId
       in: path
@@ -392,22 +401,13 @@ components:
         type: integer
         format: int64
       description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '403':
-      description: Customer is not permitted to access the resource
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
+    ShareLiquidationRequestIdPath:
+      name: shareLiquidationRequestId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The share liquidation request ID (returned by the <a href="#tag/Liquidation/operation/CreateShareLiquidationRequest">Create Liquidation operation</a>) associated with the request.
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

@@ -50,9 +50,9 @@ created: '2026-08-04'
 modified: '2026-08-04'
 tags:
 - Company
-- Financial-Services
+- Financial Services
 - Investing
-- Real-Estate
+- Real Estate
 - Private Credit
 - Venture Capital
 - Alternative Assets
@@ -70,6 +70,8 @@ tags_raw:
 - Wealth Management
 - Fintech
 - Embedded Investing
+- Financial-Services
+- Real-Estate
 apis:
 - aid: fundrise:fundrise-acknowledgments-api
   name: Fundrise Acknowledgments API

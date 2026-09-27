@@ -115,7 +115,48 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
   schemas:
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    Acknowledgment:
+      properties:
+        acknowledgmentId:
+          $ref: '#/components/schemas/Identifier'
+        acknowledgmentText:
+          description: The text to be presented for the acknowledgment to be signed.
+          maxLength: 1000
+          type: string
+    AcknowledgmentResponse:
+      title: Acknowledgment
+      type: object
+      description: A response containing an acknowledgment needed by the End-User to perform an action.
+      allOf:
+      - $ref: '#/components/schemas/Acknowledgment'
+    StringArray:
+      type: array
+      items:
+        type: string
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -138,41 +179,7 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
-    AcknowledgmentResponse:
-      title: Acknowledgment
-      type: object
-      description: A response containing an acknowledgment needed by the End-User to perform an action.
-      allOf:
-      - $ref: '#/components/schemas/Acknowledgment'
-    StringArray:
-      type: array
-      items:
-        type: string
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
-    Acknowledgment:
-      properties:
-        acknowledgmentId:
-          $ref: '#/components/schemas/Identifier'
-        acknowledgmentText:
-          description: The text to be presented for the acknowledgment to be signed.
-          maxLength: 1000
-          type: string
   parameters:
-    OfferingIdPath:
-      name: offeringId
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/Identifier'
-        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
     OfferingIdsQuery:
       name: offeringIds
       in: query
@@ -182,20 +189,13 @@ components:
         items:
           $ref: '#/components/schemas/Identifier'
         description: The Offering IDs (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
+    OfferingIdPath:
+      name: offeringId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+        description: The Offering ID (returned by the <a href="#tag/Offerings/operation/GetOfferings">Get Offerings</a> operation) associated with the request.
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
