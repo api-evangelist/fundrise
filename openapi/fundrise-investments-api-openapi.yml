@@ -211,67 +211,7 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
   schemas:
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
-    TransactionOfferingResponse:
-      title: Transaction Offering Response
-      description: An Offering included in a Transaction
-      type: object
-      properties:
-        offeringId:
-          $ref: '#/components/schemas/Identifier'
-          description: The Offering ID
-        offeringName:
-          description: The Offering name.
-          maxLength: 2000
-          type: string
-        shares:
-          $ref: '#/components/schemas/SharePrecision'
-          description: The number of shares in the Transaction
-        sharePrice:
-          description: The value in USD per share at the time of processing.
-          type: string
-          format: double
-        amount:
-          description: 'The total amount in USD to be returned to the Client, net of fees.  For example, the `amount` to be returned is described by the following formula:
-
-
-            `amount = (shares * sharePrice) - fees`.'
-          type: string
-          format: double
-      required:
-      - offeringId
-      - offeringName
-    SharePrecision:
-      title: SharePrecision
-      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
-      type: string
-      format: double
-      example: '10.000001'
-    DebitCreditTypeEnum:
-      title: Debit/Credit type
-      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
-      type: string
-      enum:
-      - DEBIT
-      - CREDIT
     TransactionStatusEnum:
       title: Transaction Status
       description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
@@ -280,64 +220,24 @@ components:
       - PENDING
       - COMPLETE
       - FAILED
+    DebitCreditTypeEnum:
+      title: Debit/Credit type
+      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
+      type: string
+      enum:
+      - DEBIT
+      - CREDIT
     Identifier:
       title: Identifier
       description: Value for a unique identifier.
       type: string
       format: int64
-    InvestmentPlacementRequest:
-      title: Investment Placement
-      type: object
-      description: An Investment placement request.
-      required:
-      - partnerReferenceId
-      - amount
-      - offeringId
-      - acknowledgedDocumentIds
-      properties:
-        partnerReferenceId:
-          description: An idempotency key to ensure duplicate Investments are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Investment in their system.
-          type: string
-          x-field-extra-annotation: '@NotBlank'
-        offeringId:
-          description: The Offering ID
-          $ref: '#/components/schemas/Identifier'
-        amount:
-          description: The amount in USD to be purchased. The maximum decimal places is 2.
-          type: string
-          format: double
-          x-field-extra-annotation: '@Min(10) @Max(100000) @Digits(integer = 999999, fraction = 2, message = "decimal places must be less than or equal to 2")'
-        acknowledgedDocumentIds:
-          type: array
-          description: A list of `InvestmentAcknowledgment` IDs representing signatures of said acknowledgments. Submission of these IDs indicates that the user has both signed and consents to the acknowledgment agreements.
-          items:
-            $ref: '#/components/schemas/Identifier'
-    StringArray:
-      type: array
-      items:
-        type: string
-    FundriseConnectError:
-      title: Error object
-      description: Error from Fundrise Connect.
-      type: object
-      properties:
-        referenceId:
-          description: A unique reference ID generated for every request that is for error tracing.
-          maxLength: 1000
-          type: string
-        code:
-          description: A numeric code mapping to a specific validation error.
-          maxLength: 6
-          type: string
-        message:
-          description: A human readable description of the error.
-          maxLength: 1000
-          type: string
-        validationErrors:
-          description: A map of field names to an array of form validation error messages
-          $ref: '#/components/schemas/FieldErrorMap'
-      required:
-      - referenceId
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
     TransactionResponse:
       title: TransactionResponse
       description: An abstract response representing the core Transaction properties.
@@ -382,6 +282,10 @@ components:
       - description
       - status
       - debitCreditMemo
+    StringArray:
+      type: array
+      items:
+        type: string
     TransactionTypeEnum:
       title: Transaction Type
       description: Enum representing the type of financial Transaction.
@@ -389,6 +293,88 @@ components:
       - INVESTMENT
       - LIQUIDATION
       - DIVIDEND
+    TransactionOfferingResponse:
+      title: Transaction Offering Response
+      description: An Offering included in a Transaction
+      type: object
+      properties:
+        offeringId:
+          $ref: '#/components/schemas/Identifier'
+          description: The Offering ID
+        offeringName:
+          description: The Offering name.
+          maxLength: 2000
+          type: string
+        shares:
+          $ref: '#/components/schemas/SharePrecision'
+          description: The number of shares in the Transaction
+        sharePrice:
+          description: The value in USD per share at the time of processing.
+          type: string
+          format: double
+        amount:
+          description: 'The total amount in USD to be returned to the Client, net of fees.  For example, the `amount` to be returned is described by the following formula:
+
+
+            `amount = (shares * sharePrice) - fees`.'
+          type: string
+          format: double
+      required:
+      - offeringId
+      - offeringName
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    InvestmentPlacementRequest:
+      title: Investment Placement
+      type: object
+      description: An Investment placement request.
+      required:
+      - partnerReferenceId
+      - amount
+      - offeringId
+      - acknowledgedDocumentIds
+      properties:
+        partnerReferenceId:
+          description: An idempotency key to ensure duplicate Investments are not created in the system for a Partner. This is a unique ID from the Partner used to reference the Investment in their system.
+          type: string
+          x-field-extra-annotation: '@NotBlank'
+        offeringId:
+          description: The Offering ID
+          $ref: '#/components/schemas/Identifier'
+        amount:
+          description: The amount in USD to be purchased. The maximum decimal places is 2.
+          type: string
+          format: double
+          x-field-extra-annotation: '@Min(10) @Max(100000) @Digits(integer = 999999, fraction = 2, message = "decimal places must be less than or equal to 2")'
+        acknowledgedDocumentIds:
+          type: array
+          description: A list of `InvestmentAcknowledgment` IDs representing signatures of said acknowledgments. Submission of these IDs indicates that the user has both signed and consents to the acknowledgment agreements.
+          items:
+            $ref: '#/components/schemas/Identifier'
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
   parameters:
     AccountIdPath:
       name: accountId
@@ -406,6 +392,20 @@ components:
         type: integer
         format: int64
       description: The ID of the underlying Transaction object.  Transactions are differentiated by their `transactionType` field. The `transactionId` for a given `transactionType` may be obtained from the response bodies of either the generic Transactions endpoints, or the respective Investment placement or Liquidations request endpoint called when creating the Transaction.
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
