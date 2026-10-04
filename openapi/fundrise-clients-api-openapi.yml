@@ -325,18 +325,11 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    Date:
-      title: Date String
-      description: ISO 8601 full-date in format 'YYYY-MM-DD' according to [IETF RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14)
-      type: string
-      format: date
-      example: '2021-07-15'
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
-    AddressResponse:
+    StringArray:
+      type: array
+      items:
+        type: string
+    AddressRequest:
       $ref: '#/components/schemas/Address'
     ClientCreationRequest:
       title: Client Creation Request
@@ -381,15 +374,70 @@ components:
       - taxId
       - primaryAddress
       - dateOfBirth
-    AccountIdResponse:
-      title: Account ID Response
-      description: A Fundrise Client Account object containing the ID of created Account.
-      type: object
+    ClientResponse:
+      description: A Fundrise Client Object.
       properties:
-        accountId:
-          description: Long-term persistent public identity of the Account with Fundrise.
+        clientId:
+          description: Long-term persistent public identity of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        primaryEmail:
+          description: The Client's primary email address.
+          maxLength: 256
           type: string
-          format: int64
+        firstName:
+          description: The Client's first name.
+          maxLength: 256
+          type: string
+        lastName:
+          description: The Client's last name.
+          maxLength: 256
+          type: string
+        taxId:
+          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
+          maxLength: 256
+          type: string
+        primaryAddress:
+          $ref: '#/components/schemas/AddressResponse'
+          description: Client's primary address.
+        dateOfBirth:
+          $ref: '#/components/schemas/Date'
+          description: The Client's date of birth.
+        accounts:
+          description: An array of accounts belonging to the Client. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+    ClientUpdateRequest:
+      description: A Fundrise Client Update Request Object.
+      properties:
+        primaryEmail:
+          description: The Client's email address.
+          maxLength: 150
+          type: string
+          format: email
+          x-field-extra-annotation: '@Email'
+        firstName:
+          description: The Client's current first name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        lastName:
+          description: The Client's current last name.
+          maxLength: 150
+          minLength: 2
+          type: string
+        primaryAddress:
+          $ref: '#/components/schemas/AddressRequest'
+          description: Client's primary address.
     Address:
       title: Address
       description: An address object.
@@ -433,92 +481,12 @@ components:
       - state
       - zip
       - country
-    StringArray:
-      type: array
-      items:
-        type: string
-    ClientUpdateRequest:
-      description: A Fundrise Client Update Request Object.
-      properties:
-        primaryEmail:
-          description: The Client's email address.
-          maxLength: 150
-          type: string
-          format: email
-          x-field-extra-annotation: '@Email'
-        firstName:
-          description: The Client's current first name.
-          maxLength: 150
-          minLength: 2
-          type: string
-        lastName:
-          description: The Client's current last name.
-          maxLength: 150
-          minLength: 2
-          type: string
-        primaryAddress:
-          $ref: '#/components/schemas/AddressRequest'
-          description: Client's primary address.
-    ClientUpdateResponse:
-      description: An updated Fundrise Client object.
-      allOf:
-      - $ref: '#/components/schemas/ClientResponse'
-    ClientResponse:
-      description: A Fundrise Client Object.
-      properties:
-        clientId:
-          description: Long-term persistent public identity of the Client with Fundrise.
-          $ref: '#/components/schemas/Identifier'
-        primaryEmail:
-          description: The Client's primary email address.
-          maxLength: 256
-          type: string
-        firstName:
-          description: The Client's first name.
-          maxLength: 256
-          type: string
-        lastName:
-          description: The Client's last name.
-          maxLength: 256
-          type: string
-        taxId:
-          description: The Client's Social Security Number. This is a 9 digit integer without hyphens.
-          maxLength: 256
-          type: string
-        primaryAddress:
-          $ref: '#/components/schemas/AddressResponse'
-          description: Client's primary address.
-        dateOfBirth:
-          $ref: '#/components/schemas/Date'
-          description: The Client's date of birth.
-        accounts:
-          description: An array of accounts belonging to the Client. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountIdResponse'
-    ClientCreationResponse:
-      title: Client Creation Response
-      description: A Fundrise Client Creation Response Object.
-      type: object
-      properties:
-        refreshToken:
-          description: A non expiring OAuth Refresh Token to enable API access on behalf of the newly created Client.  This should be securely stored and treated as if it were a password.
-          maxLength: 256
-          type: string
-        clientId:
-          description: Unique public identifier of the Client with Fundrise.
-          $ref: '#/components/schemas/Identifier'
-        accounts:
-          description: An array of accounts belonging to the Client object. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountIdResponse'
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
-    AddressRequest:
-      $ref: '#/components/schemas/Address'
+    Date:
+      title: Date String
+      description: ISO 8601 full-date in format 'YYYY-MM-DD' according to [IETF RFC3339](https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14)
+      type: string
+      format: date
+      example: '2021-07-15'
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -541,9 +509,39 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
+    AccountIdResponse:
+      title: Account ID Response
+      description: A Fundrise Client Account object containing the ID of created Account.
+      type: object
+      properties:
+        accountId:
+          description: Long-term persistent public identity of the Account with Fundrise.
+          type: string
+          format: int64
+    ClientCreationResponse:
+      title: Client Creation Response
+      description: A Fundrise Client Creation Response Object.
+      type: object
+      properties:
+        refreshToken:
+          description: A non expiring OAuth Refresh Token to enable API access on behalf of the newly created Client.  This should be securely stored and treated as if it were a password.
+          maxLength: 256
+          type: string
+        clientId:
+          description: Unique public identifier of the Client with Fundrise.
+          $ref: '#/components/schemas/Identifier'
+        accounts:
+          description: An array of accounts belonging to the Client object. By default a single Account will be created for the Client and this array can be assumed to have a size of 1 in this version of the API.
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountIdResponse'
+    ClientUpdateResponse:
+      description: An updated Fundrise Client object.
+      allOf:
+      - $ref: '#/components/schemas/ClientResponse'
+    AddressResponse:
+      $ref: '#/components/schemas/Address'
   responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
     '500':
       description: Internal Service Error
       content:
@@ -555,6 +553,8 @@ components:
               value:
                 referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
                 message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
     '403':
       description: Customer is not permitted to access the resource
   securitySchemes:

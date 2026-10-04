@@ -212,46 +212,6 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    DebitCreditTypeEnum:
-      title: Debit/Credit type
-      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
-      type: string
-      enum:
-      - DEBIT
-      - CREDIT
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
-    SharePrecision:
-      title: SharePrecision
-      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
-      type: string
-      format: double
-      example: '10.000001'
-    FundriseConnectError:
-      title: Error object
-      description: Error from Fundrise Connect.
-      type: object
-      properties:
-        referenceId:
-          description: A unique reference ID generated for every request that is for error tracing.
-          maxLength: 1000
-          type: string
-        code:
-          description: A numeric code mapping to a specific validation error.
-          maxLength: 6
-          type: string
-        message:
-          description: A human readable description of the error.
-          maxLength: 1000
-          type: string
-        validationErrors:
-          description: A map of field names to an array of form validation error messages
-          $ref: '#/components/schemas/FieldErrorMap'
-      required:
-      - referenceId
     TransactionTypeEnum:
       title: Transaction Type
       description: Enum representing the type of financial Transaction.
@@ -259,10 +219,6 @@ components:
       - INVESTMENT
       - LIQUIDATION
       - DIVIDEND
-    StringArray:
-      type: array
-      items:
-        type: string
     TransactionOfferingResponse:
       title: Transaction Offering Response
       description: An Offering included in a Transaction
@@ -292,18 +248,11 @@ components:
       required:
       - offeringId
       - offeringName
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
-    TransactionStatusEnum:
-      title: Transaction Status
-      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
       type: string
-      enum:
-      - PENDING
-      - COMPLETE
-      - FAILED
+      format: int64
     TransactionResponse:
       title: TransactionResponse
       description: An abstract response representing the core Transaction properties.
@@ -348,7 +297,88 @@ components:
       - description
       - status
       - debitCreditMemo
+    DebitCreditTypeEnum:
+      title: Debit/Credit type
+      description: '`DEBIT` indicates an outbound movement of money. <br> `CREDIT` indicates an inbound movement of money.'
+      type: string
+      enum:
+      - DEBIT
+      - CREDIT
+    FundriseConnectError:
+      title: Error object
+      description: Error from Fundrise Connect.
+      type: object
+      properties:
+        referenceId:
+          description: A unique reference ID generated for every request that is for error tracing.
+          maxLength: 1000
+          type: string
+        code:
+          description: A numeric code mapping to a specific validation error.
+          maxLength: 6
+          type: string
+        message:
+          description: A human readable description of the error.
+          maxLength: 1000
+          type: string
+        validationErrors:
+          description: A map of field names to an array of form validation error messages
+          $ref: '#/components/schemas/FieldErrorMap'
+      required:
+      - referenceId
+    TransactionStatusEnum:
+      title: Transaction Status
+      description: '`PENDING` indicates the Transaction is pending. `COMPLETE` indicates that the Transaction has completed. This is a terminal state. <br> `FAILED` indicates that the Transaction was not successful. This is a terminal state. <br>'
+      type: string
+      enum:
+      - PENDING
+      - COMPLETE
+      - FAILED
+    StringArray:
+      type: array
+      items:
+        type: string
+    SharePrecision:
+      title: SharePrecision
+      description: Value can be fractional, with a precision up to 6 decimal places. Intended to be used as the standard format for shares.
+      type: string
+      format: double
+      example: '10.000001'
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+  responses:
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '403':
+      description: Customer is not permitted to access the resource
   parameters:
+    TransactionTypeQuery:
+      name: transactionType
+      in: query
+      description: Enum indicating the underlying object type that the Transaction represents.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TransactionTypeEnum'
+    TransactionTypePath:
+      in: path
+      name: transactionType
+      required: true
+      schema:
+        $ref: '#/components/schemas/TransactionTypeEnum'
+      description: The type associated with the Transaction ID.
     TransactionIdPath:
       in: path
       name: transactionId
@@ -365,36 +395,6 @@ components:
         type: integer
         format: int64
       description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
-    TransactionTypeQuery:
-      name: transactionType
-      in: query
-      description: Enum indicating the underlying object type that the Transaction represents.
-      required: false
-      schema:
-        $ref: '#/components/schemas/TransactionTypeEnum'
-    TransactionTypePath:
-      in: path
-      name: transactionType
-      required: true
-      schema:
-        $ref: '#/components/schemas/TransactionTypeEnum'
-      description: The type associated with the Transaction ID.
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
-    '403':
-      description: Customer is not permitted to access the resource
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

@@ -57,6 +57,38 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  parameters:
+    TaxYearQuery:
+      name: taxYear
+      in: query
+      description: Tax year in which to search for tax forms.
+      required: false
+      schema:
+        type: integer
+    AccountIdPath:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
+  responses:
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '403':
+      description: Customer is not permitted to access the resource
   schemas:
     Identifier:
       title: Identifier
@@ -80,14 +112,6 @@ components:
         documentTitle:
           description: Title for the document
           type: string
-    StringArray:
-      type: array
-      items:
-        type: string
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -110,38 +134,14 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
-  parameters:
-    AccountIdPath:
-      name: accountId
-      in: path
-      required: true
-      schema:
-        type: integer
-        format: int64
-      description: The account ID (returned by the <a href="#tag/Clients/operation/CreateClient">Create Client operation</a> or the <a href="#tag/Clients/operation/GetClient">Get Client operation</a>) associated with the request.
-    TaxYearQuery:
-      name: taxYear
-      in: query
-      description: Tax year in which to search for tax forms.
-      required: false
-      schema:
-        type: integer
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
-    '403':
-      description: Customer is not permitted to access the resource
+    StringArray:
+      type: array
+      items:
+        type: string
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

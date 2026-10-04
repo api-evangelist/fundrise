@@ -112,10 +112,6 @@ components:
     '403':
       description: Customer is not permitted to access the resource
   schemas:
-    StringArray:
-      type: array
-      items:
-        type: string
     OAuth2AccessTokenResponse:
       description: Contains information needed to leverage the Client Bearer Authentication security scheme. Values are sensitive and allow api calls on behalf of a specific Client. The access token is to  be used in subsequent API calls protected by the Client Bearer Authentication schema. The access token is for individual Clients, and usage of the same token for multiple  Clients will cause unintended actions within our API.
       properties:
@@ -140,10 +136,6 @@ components:
           type: string
           format: int64
           example: '3598'
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -166,6 +158,14 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
+    StringArray:
+      type: array
+      items:
+        type: string
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.

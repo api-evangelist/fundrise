@@ -168,11 +168,6 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    Identifier:
-      title: Identifier
-      description: Value for a unique identifier.
-      type: string
-      format: int64
     DocumentResponse:
       title: Document
       description: A Fundrise Document.
@@ -190,77 +185,6 @@ components:
         documentUrl:
           maxLength: 2000
           type: string
-    OfferingStatusEnum:
-      title: Offering Status
-      description: The current status of the offering. `OPEN` indicates the Offering can be invested in while `CLOSED` indicates the Offering is unavailable.
-      maxLength: 256
-      enum:
-      - OPEN
-      - CLOSED
-    AssetClassEnum:
-      title: Asset Class type
-      description: The asset class of the offering.
-      maxLength: 256
-      enum:
-      - REAL_ESTATE
-      - PRIVATE_CREDIT
-      - VENTURE
-    AssetClass:
-      title: Asset Class
-      description: The asset class of the offering.
-      type: object
-      properties:
-        assetClassType:
-          $ref: '#/components/schemas/AssetClassEnum'
-        assetClassLabel:
-          type: string
-          description: Human readable label for the asset class
-    StringArray:
-      type: array
-      items:
-        type: string
-    OfferingNavResponse:
-      title: Offering NAV Response
-      description: A historical daily NAV entry
-      properties:
-        effectiveDate:
-          description: The date the NAV was effective.
-          type: string
-          format: date-time
-        netAssetValuePerShare:
-          description: The share value.
-          type: string
-          format: double
-    DocumentTypeEnum:
-      title: Document Type
-      description: Enum representing the document type.
-      maxLength: 256
-      enum:
-      - AGREEMENT
-      - ACKNOWLEDGMENT
-      - DISCLOSURE
-      - PROSPECTUS
-      - OFFERING_CIRCULAR
-      - OTHER
-      - STATEMENT
-      - TAX_FORM
-    PriceResponse:
-      title: Price Response
-      description: A Fundrise Offering Price.
-      type: object
-      properties:
-        price:
-          description: The Offering Price.
-          type: string
-          format: double
-        priceDate:
-          description: The effective date-time of the price.
-          type: string
-          format: date-time
-    FieldErrorMap:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/StringArray'
     OfferingResponse:
       title: Offering Response
       description: A Fundrise Offering.
@@ -306,6 +230,13 @@ components:
       - maximumInvestmentAmount
       - primaryObjective
       - currentDistributionRate
+    OfferingStatusEnum:
+      title: Offering Status
+      description: The current status of the offering. `OPEN` indicates the Offering can be invested in while `CLOSED` indicates the Offering is unavailable.
+      maxLength: 256
+      enum:
+      - OPEN
+      - CLOSED
     OfferingHistoricalNavResponse:
       title: Offering NAV Response
       description: Historical Daily NAV for a Fundrise Offering.
@@ -322,6 +253,44 @@ components:
       required:
       - offeringId
       - historicalDailyNav
+    DocumentTypeEnum:
+      title: Document Type
+      description: Enum representing the document type.
+      maxLength: 256
+      enum:
+      - AGREEMENT
+      - ACKNOWLEDGMENT
+      - DISCLOSURE
+      - PROSPECTUS
+      - OFFERING_CIRCULAR
+      - OTHER
+      - STATEMENT
+      - TAX_FORM
+    Identifier:
+      title: Identifier
+      description: Value for a unique identifier.
+      type: string
+      format: int64
+    AssetClassEnum:
+      title: Asset Class type
+      description: The asset class of the offering.
+      maxLength: 256
+      enum:
+      - REAL_ESTATE
+      - PRIVATE_CREDIT
+      - VENTURE
+    OfferingNavResponse:
+      title: Offering NAV Response
+      description: A historical daily NAV entry
+      properties:
+        effectiveDate:
+          description: The date the NAV was effective.
+          type: string
+          format: date-time
+        netAssetValuePerShare:
+          description: The share value.
+          type: string
+          format: double
     FundriseConnectError:
       title: Error object
       description: Error from Fundrise Connect.
@@ -344,6 +313,51 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
+    PriceResponse:
+      title: Price Response
+      description: A Fundrise Offering Price.
+      type: object
+      properties:
+        price:
+          description: The Offering Price.
+          type: string
+          format: double
+        priceDate:
+          description: The effective date-time of the price.
+          type: string
+          format: date-time
+    StringArray:
+      type: array
+      items:
+        type: string
+    AssetClass:
+      title: Asset Class
+      description: The asset class of the offering.
+      type: object
+      properties:
+        assetClassType:
+          $ref: '#/components/schemas/AssetClassEnum'
+        assetClassLabel:
+          type: string
+          description: Human readable label for the asset class
+    FieldErrorMap:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/StringArray'
+  responses:
+    '401':
+      description: Unauthorized request to server, Invalid access token or Partner credentials
+    '500':
+      description: Internal Service Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FundriseConnectError'
+          examples:
+            clientExists:
+              value:
+                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
+                message: Internal service error
   parameters:
     OfferingIdPath:
       name: offeringId
@@ -359,20 +373,6 @@ components:
       required: false
       schema:
         $ref: '#/components/schemas/AssetClassEnum'
-  responses:
-    '401':
-      description: Unauthorized request to server, Invalid access token or Partner credentials
-    '500':
-      description: Internal Service Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/FundriseConnectError'
-          examples:
-            clientExists:
-              value:
-                referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
-                message: Internal service error
   securitySchemes:
     PartnerBasicAuthentication:
       description: PartnerBasicAuthentication is enforced by HTTP Basic Authentication. A Partner username and password will be provided by Fundrise support.  The Partner password should be stored securely. At a minimum, it should be encrypted at-rest and access restricted to services making requests to the Fundrise API. The Partner password should not be exposed to a Client or any of their devices. If the password is compromised please contact Fundrise support.
