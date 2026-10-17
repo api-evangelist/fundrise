@@ -98,6 +98,8 @@ components:
   responses:
     '401':
       description: Unauthorized request to server, Invalid access token or Partner credentials
+    '403':
+      description: Customer is not permitted to access the resource
     '500':
       description: Internal Service Error
       content:
@@ -109,9 +111,11 @@ components:
               value:
                 referenceId: ed8583b9-6cd9-43ed-ad46-c7c52fff0c35
                 message: Internal service error
-    '403':
-      description: Customer is not permitted to access the resource
   schemas:
+    StringArray:
+      type: array
+      items:
+        type: string
     OAuth2AccessTokenResponse:
       description: Contains information needed to leverage the Client Bearer Authentication security scheme. Values are sensitive and allow api calls on behalf of a specific Client. The access token is to  be used in subsequent API calls protected by the Client Bearer Authentication schema. The access token is for individual Clients, and usage of the same token for multiple  Clients will cause unintended actions within our API.
       properties:
@@ -158,10 +162,6 @@ components:
           $ref: '#/components/schemas/FieldErrorMap'
       required:
       - referenceId
-    StringArray:
-      type: array
-      items:
-        type: string
     FieldErrorMap:
       type: object
       additionalProperties:
